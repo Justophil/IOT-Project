@@ -1,0 +1,63 @@
+body {
+    background-color: #aaaaaa;
+}
+
+.header {
+	display: flex;
+	align-items: center;
+	height: 80px;
+	border-bottom: 1px solid eff1f6;
+	background-color: #aaaaaa;
+    margin: 20px;
+    align-items: center;
+}
+
+h1 {
+    text-align: center;
+    text-decoration-color: darkgrey;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+.main {
+    display:flex;
+    margin: 120px;
+    justify-content: space-evenly;
+}
+.card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;    
+    padding: 10px;
+    position: relative;
+    text-align: center;
+    align-items: center;
+    margin: 5px;
+    width: 190px;
+    height: 254px;
+    border-radius: 30px;
+    background: #212121;
+    gap: 5px;
+    box-shadow: 5px 5px 15px rgb(25, 25, 25);
+}
+.icon {
+    position: relative;
+    margin: 5px;
+    width: 96px;
+    height: 96px;
+}
+button {
+    margin: 10px;
+    text-decoration-color: #313131;
+    background-color: white;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    border-radius: 30px;
+    width: 50%;
+    height: 15%;
+}
+.toggleOn {
+    color: white;
+    background-color: #313131;
+}
+.toggleOff {
+    color: #313131;
+    background-color: white;
+}
