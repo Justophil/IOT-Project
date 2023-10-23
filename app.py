@@ -1,47 +1,25 @@
 from dash import Dash, html, callback, Output, Input, dcc
 import dash_daq as daq
-# import RPi.GPIO as GPIO
-# import Freenove_DHT as DHT
-# import time as sleep
-import smtplib
-import ssl
+import LED
+import DHT11
+import Emails as MAIL
+import DCMotor as DC
 
 app = Dash(__name__)
 
 LED_ON = '/assets/img/on.png'
 LED_OFF = '/assets/img/off.png'
 
-# GPIO.setwarnings(False) # Ignore warning for now
-# GPIO.setmode(GPIO.BCM) # Use physical pin numbering
-
-LED=23
-DHT11=24
+LEDPin=23
+DHT11Pin=18 #! BOARD PIN
 ENABLEDC=17
 INPUT1DC=22
 INPUT2DC=27
 
-# GPIO.setup(LED, GPIO.OUT, initial=GPIO.LOW)
-
-# Setup port number and servr name
-
-smtp_port = 587                 # Standard secure SMTP port
-smtp_server = "smtp.gmail.com"  # Google SMTP Server
-
-email_from = "phildschool@gmail.com"
-email_to = "phildschool@gmail.com"
-
-pswd = 'vjty nkvt olic dvsd'
-
-message = """From: From IOT-Dashboard <iotdashboard@iotDash.com>
-To: Phil <phildschool@gmail.com>
-Subject: Notice! the room is getting hot
-
-
-Would you like to turn on the fan?
-if yes, reply to this email with a yes
-"""    
-
-simple_email_context = ssl.create_default_context()
+LED = LED.LED(LEDPin)
+DC = DC.DCMotor(ENABLEDC, INPUT1DC, INPUT2DC)
+DHT11 = DHT11.DHT11(DHT11Pin)
+MAIL = MAIL.Email()
 
 temp=0;
 humid=0;
@@ -74,6 +52,11 @@ app.layout = html.Div([
                         'red':[30, 40],
                     }
                 }
+            ),
+            dcc.Interval(
+                id='dht_frame',
+                interval=500,
+                n_intervals=0,
             )
             # html.Button(children='Switch', n_clicks=0, id='button-on-and-off'),
         ],className="card"),
@@ -97,12 +80,17 @@ app.layout = html.Div([
                     }
                 }
             ),
-
             # html.Button(children='Switch', n_clicks=0, id='button-on-and-off'),
         ],className="card"),
         html.Div(children=[
             html.Img(id='fan', src=LED_OFF),
             html.Button(children='Switch', n_clicks=0, id='fan-on-and-off'),
+            dcc.Interval(
+                id='fan_frame',
+                interval=1000,
+                n_intervals=0,
+                max_intervals=60000
+            ),
         ],className="card"),
     ],className='main'),
 ])
@@ -113,13 +101,22 @@ app.layout = html.Div([
 )
 def update_LED (n_clicks):
     click = n_clicks % 2
-    print('light click')
     if click:
-        # GPIO.output(LED, GPIO.HIGH)
+        LED.turn_on()
         return [LED_ON,'toggleOn']
     else:
-        # GPIO.output(LED, GPIO.LOW)
+        LED.turn_off()
         return [LED_OFF,'toggleOff']
+# live checking for data change
+@app.callback(
+        [Output('temperature', 'value'), Output('humidity', 'value')],
+        Input('dht_frame','n_intervals')
+)
+def updateDHT(n):
+    if(n % 2 == 0):
+        # return DHT11.read()
+        return [(n / 3), n] # tresting
+    return
     
 @app.callback(
         [Output('fan', 'src'),Output('fan-on-and-off', 'className')],
@@ -127,64 +124,16 @@ def update_LED (n_clicks):
 )
 def update_FAN(n_clicks):
     click = n_clicks % 2
-    print('fan click')
     if click:
-        # GPIO.output(LED, GPIO.HIGH)
+        # DC Turn on for testing
         return [LED_ON,'toggleOn']
     else:
-        # GPIO.output(LED, GPIO.LOW)
+        # DC Turn off for testing
         return [LED_OFF,'toggleOff']
 
-def sendEmail():
-    try:
-        # Connect to the server
-        print("Connecting to server...")
-        TIE_server = smtplib.SMTP(smtp_server, smtp_port)
-        TIE_server.starttls(context=simple_email_context)
-        TIE_server.login(email_from, pswd)
-        print("Connected to server")
-        
-        # Send the actual email
-        print()
-        print(f"Sending email to - {email_to}")
-        TIE_server.sendmail(email_from, email_to, message)
-        print(f"Email successfully sent to - {email_to}")
-
-    # If there's an error, print it out
-    except Exception as e:
-        print(e)
-
-    # Close the port
-    finally:
-        TIE_server.quit()
-    receiveEmail()
-
-# code to receive email here
-def receiveEmail():
-    return 
-
-# def readDHT():
-#     dht = DHT.DHT(DHT11) #create a DHT class object
-#     counts = 0 # Measurement counts
-#     while(True):
-#         counts += 1
-#         for i in range(0,15):
-#             chk = dht.readDHT11() #read DHT11 and get a return value. Then determine whether
-#         #data read is normal according to the return value.
-#             if (chk is dht.DHTLIB_OK): #read DHT11 and get a return value. Then determine
-#             #whether data read is normal according to the return value.
-#                 break
-#             sleep(0.1)
-#         humid = dht.humidity
-#         temp = dht.temperature
-#         sleep(2)
-
-# turn on and off dc motor here
-def turnDCMotor():
-    return
-
-# live checking for data change
-def updateDashboard():
+# live checking to turn on and off dc motor here
+#TODO: check for 24 Degrees Cel then send email then receive then turn on if yes, keep it off otherwise, it has a timer of 1 minute for the reply
+def turnFan():
     return
 
 if __name__ == '__main__':
