@@ -7,8 +7,8 @@ import ssl
 
 app = Dash(__name__)
 
-IMG_ON = '/assets/img/on.png'
-IMG_OFF = '/assets/img/off.png'
+LED_ON = '/assets/img/on.png'
+LED_OFF = '/assets/img/off.png'
 
 # GPIO.setwarnings(False) # Ignore warning for now
 # GPIO.setmode(GPIO.BCM) # Use physical pin numbering
@@ -42,24 +42,21 @@ app.layout = html.Div([
     ], className="header"),
     html.Div(children=[
         html.Div(children=[
-            html.Img(id='bulb', src=IMG_OFF),
+            html.Img(id='bulb', src=LED_OFF),
             html.Button(children='Switch', n_clicks=0, id='light-on-and-off'),
             html.Button(children='Send Email', n_clicks=0, id='button-send-email'),
         ],className="card"),
         html.Div(children=[
-            # html.Img(id='bulb', src=IMG_OFF),
+            # html.Img(id='bulb', src=LED_OFF),
             # html.Button(children='Switch', n_clicks=0, id='button-on-and-off'),
-            # html.Button(children='Send Email', n_clicks=0, id='button-send-email'),
         ],className="card"),
         html.Div(children=[
-            # html.Img(id='bulb', src=IMG_OFF),
+            # html.Img(id='bulb', src=LED_OFF),
             # html.Button(children='Switch', n_clicks=0, id='button-on-and-off'),
-            # html.Button(children='Send Email', n_clicks=0, id='button-send-email'),
         ],className="card"),
         html.Div(children=[
-            # html.Img(id='bulb', src=IMG_OFF),
-            # html.Button(children='Switch', n_clicks=0, id='button-on-and-off'),
-            # html.Button(children='Send Email', n_clicks=0, id='button-send-email'),
+            html.Img(id='fan', src=LED_OFF),
+            html.Button(children='Switch', n_clicks=0, id='fan-on-and-off'),
         ],className="card"),
     ],className='main'),
 ])
@@ -73,10 +70,11 @@ def update_LED (n_clicks):
     print('light click')
     if click:
         # GPIO.output(LED, GPIO.HIGH)
-        return [IMG_ON,'toggleOn']
+        return [LED_ON,'toggleOn']
     else:
         # GPIO.output(LED, GPIO.LOW)
-        return [IMG_OFF,'toggleOff']
+        return [LED_OFF,'toggleOff']
+    
 @app.callback(
     #adding an array means the input or output must contain an array
     Output('button-send-email', 'className'),
@@ -111,6 +109,20 @@ def sendEmail(n_clicks):
 
 def receiveEmail():
     return
+
+@app.callback(
+        [Output('fan', 'src'),Output('fan-on-and-off', 'className')],
+        Input('fan-on-and-off', 'n_clicks')
+)
+def update_FAN(n_clicks):
+    click = n_clicks % 2
+    print('fan click')
+    if click:
+        # GPIO.output(LED, GPIO.HIGH)
+        return [LED_ON,'toggleOn']
+    else:
+        # GPIO.output(LED, GPIO.LOW)
+        return [LED_OFF,'toggleOff']
 
 if __name__ == '__main__':
     # this is a theory but
