@@ -1,6 +1,7 @@
-from dash import Dash, html, callback, Output, Input
+from dash import Dash, html, callback, Output, Input, dcc
 import dash_daq as daq
 # import RPi.GPIO as GPIO
+# import Freenove_DHT as DHT
 # import time as sleep
 import smtplib
 import ssl
@@ -12,7 +13,13 @@ LED_OFF = '/assets/img/off.png'
 
 # GPIO.setwarnings(False) # Ignore warning for now
 # GPIO.setmode(GPIO.BCM) # Use physical pin numbering
-# LED=17
+
+LED=23
+DHT11=24
+ENABLEDC=17
+INPUT1DC=22
+INPUT2DC=27
+
 # GPIO.setup(LED, GPIO.OUT, initial=GPIO.LOW)
 
 # Setup port number and servr name
@@ -36,6 +43,9 @@ if yes, reply to this email with a yes
 
 simple_email_context = ssl.create_default_context()
 
+temp=0;
+humid=0;
+
 app.layout = html.Div([
     html.Div(children=[
         html.H1('Dashboard'),
@@ -44,14 +54,50 @@ app.layout = html.Div([
         html.Div(children=[
             html.Img(id='bulb', src=LED_OFF),
             html.Button(children='Switch', n_clicks=0, id='light-on-and-off'),
-            html.Button(children='Send Email', n_clicks=0, id='button-send-email'),
         ],className="card"),
         html.Div(children=[
-            # html.Img(id='bulb', src=LED_OFF),
+            daq.Gauge(
+                label='Temperature',
+                id='temperature',
+                min=0,
+                max=40,
+                value=temp,
+                className="icon",
+                showCurrentValue=True,
+                units="C",
+                color={
+                    'gradient':True,
+                    'ranges':{
+                        'green':[0, 10],
+                        'yellow':[10, 20],
+                        'orange':[20, 30],
+                        'red':[30, 40],
+                    }
+                }
+            )
             # html.Button(children='Switch', n_clicks=0, id='button-on-and-off'),
         ],className="card"),
         html.Div(children=[
-            # html.Img(id='bulb', src=LED_OFF),
+            daq.Gauge(
+                label='Humidity',
+                id='humidity',
+                min=0,
+                max=100,
+                value=humid,
+                className="icon",
+                showCurrentValue=True,
+                units="%",
+                color={
+                    'gradient':True,
+                    'ranges':{
+                        'green':[0, 25],
+                        'yellow':[25, 50],
+                        'orange':[50, 75],
+                        'red':[75, 100],
+                    }
+                }
+            ),
+
             # html.Button(children='Switch', n_clicks=0, id='button-on-and-off'),
         ],className="card"),
         html.Div(children=[
@@ -76,13 +122,20 @@ def update_LED (n_clicks):
         return [LED_OFF,'toggleOff']
     
 @app.callback(
-    #adding an array means the input or output must contain an array
-    Output('button-send-email', 'className'),
-    Input('button-send-email', 'n_clicks')
+        [Output('fan', 'src'),Output('fan-on-and-off', 'className')],
+        Input('fan-on-and-off', 'n_clicks')
 )
-def sendEmail(n_clicks):
-    if n_clicks == 0: return
-    print('email click')
+def update_FAN(n_clicks):
+    click = n_clicks % 2
+    print('fan click')
+    if click:
+        # GPIO.output(LED, GPIO.HIGH)
+        return [LED_ON,'toggleOn']
+    else:
+        # GPIO.output(LED, GPIO.LOW)
+        return [LED_OFF,'toggleOff']
+
+def sendEmail():
     try:
         # Connect to the server
         print("Connecting to server...")
@@ -105,24 +158,34 @@ def sendEmail(n_clicks):
     finally:
         TIE_server.quit()
     receiveEmail()
-    return 'sent'
 
+# code to receive email here
 def receiveEmail():
+    return 
+
+# def readDHT():
+#     dht = DHT.DHT(DHT11) #create a DHT class object
+#     counts = 0 # Measurement counts
+#     while(True):
+#         counts += 1
+#         for i in range(0,15):
+#             chk = dht.readDHT11() #read DHT11 and get a return value. Then determine whether
+#         #data read is normal according to the return value.
+#             if (chk is dht.DHTLIB_OK): #read DHT11 and get a return value. Then determine
+#             #whether data read is normal according to the return value.
+#                 break
+#             sleep(0.1)
+#         humid = dht.humidity
+#         temp = dht.temperature
+#         sleep(2)
+
+# turn on and off dc motor here
+def turnDCMotor():
     return
 
-@app.callback(
-        [Output('fan', 'src'),Output('fan-on-and-off', 'className')],
-        Input('fan-on-and-off', 'n_clicks')
-)
-def update_FAN(n_clicks):
-    click = n_clicks % 2
-    print('fan click')
-    if click:
-        # GPIO.output(LED, GPIO.HIGH)
-        return [LED_ON,'toggleOn']
-    else:
-        # GPIO.output(LED, GPIO.LOW)
-        return [LED_OFF,'toggleOff']
+# live checking for data change
+def updateDashboard():
+    return
 
 if __name__ == '__main__':
     # this is a theory but
@@ -131,3 +194,4 @@ if __name__ == '__main__':
     # app.run(host='0.0.0.0',debug=True)
     # this is if you want to run it on your current device
     app.run(debug=True)
+    
