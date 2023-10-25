@@ -22,6 +22,7 @@ DHT11 = DHT11.DHT11(DHT11Pin)
 MAIL = MAIL.Email()
 
 not_sent=1
+fan_status=0
 
 app.layout = html.Div([
     html.Div(children=[
@@ -81,12 +82,12 @@ app.layout = html.Div([
         ],className="card"),
         html.Div(children=[
             html.Img(id='fan', src=LED_OFF),
-            html.Button(children='Switch', n_clicks=0, id='fan-on-and-off'),
-            dcc.Interval(
-                id='fan_frame',
-                interval=1000,
-                n_intervals=60,
-            ),
+            # html.Button(children='Switch', n_clicks=0, id='fan-on-and-off'),
+            # dcc.Interval(
+            #     id='fan_frame',
+            #     interval=1000,
+            #     n_intervals=60,
+            # ),
         ],className="card"),
     ],className='main'),
 ])
@@ -131,18 +132,20 @@ def updateDHT(n):
 # live checking to turn on and off dc motor here
 #TODO: check for 24 Degrees Cel then send email then receive then turn on if yes, keep it off otherwise, it has a timer of 1 minute for the reply
 @app.callback(
-    [Output('fan_frame', 'n_intervals'),Output('fan', 'src'),Output('fan-on-and-off', 'className')],
-    [Input('temperature', 'value'), Input('fan_frame', 'n_intervals')]
+    # [Output('fan_frame', 'n_intervals'),Output('fan', 'src'),Output('fan-on-and-off', 'className')],
+    # [Output('fan', 'src'),Output('fan-on-and-off', 'className')],
+    [Output('fan', 'src')],
+    # [Input('temperature', 'value'), Input('fan_frame', 'n_intervals')]
+    [Input('temperature', 'value')]
 )
-def updateFan(temp, n_intervals):
+def updateFan(temp):
     global not_sent
+    global fan_status
     print(not_sent)
-    print(n_intervals)
-    if (n_intervals <= 60 and not not_sent):
+    if (temp < 24 and not not_sent):
         not_sent=1
-    if temp >= 24 and n_intervals >= 60 and not_sent:
+    if temp >= 24 and not_sent:
         not_sent=0
-        print('hello')
         # Send email
         MAIL.send()
         print('email sent')
@@ -158,15 +161,29 @@ def updateFan(temp, n_intervals):
             # User replied "yes", turn on the motor
             print('on')
             DC.turn_on()
-            return [0, LED_ON, 'toggleOn']
+            fan_status = 1
+            # return [0, LED_ON, 'toggleOn']
+            # return [LED_ON, 'toggleOn']
+            return [LED_ON]
         else:
             # User did not reply or replied "no", turn off the motor
             print('off')
             DC.turn_off()
-            return [0,LED_OFF, 'toggleOff']
-    print(n_intervals)
-    DC.turn_off()
-    return [n_intervals,LED_OFF, 'toggleOff']
+            fan_status = 0
+            # return [0,LED_OFF, 'toggleOff']
+            # return [LED_OFF, 'toggleOff']
+            return [LED_OFF]
+    if fan_status and temp >= 24:
+        return [LED_ON]
+    elif temp < 24 or not fan_status:
+        fan_status = 0
+        DC.turn_off()
+        return [LED_OFF]
+
+    # DC.turn_off()
+    # # return [n_intervals,LED_OFF, 'toggleOff']
+    # # return [LED_OFF, 'toggleOff']
+    # return [LED_OFF]
 
 if __name__ == '__main__':
     # this is a theory but
