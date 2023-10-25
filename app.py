@@ -113,32 +113,34 @@ def updateDHT(n):
     return [n, n]
 
 # live checking to turn on and off dc motor here
-@app.callback(
-        [Output('fan', 'src'),Output('fan-on-and-off', 'className')],
-        Input('fan-on-and-off', 'n_clicks')
-)
-def switchFan(n_clicks):
-    click = n_clicks % 2
-    if click:
-        # DC Turn on for testing
-        DC.turn_on()
-        return [LED_ON,'toggleOn']
-    else:
-        # DC Turn off for testing
-        DC.turn_off()
-        return [LED_OFF,'toggleOff']
+# @app.callback(
+#         [Output('fan', 'src'),Output('fan-on-and-off', 'className')],
+#         Input('fan-on-and-off', 'n_clicks')
+# )
+# def switchFan(n_clicks):
+#     click = n_clicks % 2
+#     if click:
+#         # DC Turn on for testing
+#         DC.turn_on()
+#         return [LED_ON,'toggleOn']
+#     else:
+#         # DC Turn off for testing
+#         DC.turn_off()
+#         return [LED_OFF,'toggleOff']
 
 # live checking to turn on and off dc motor here
 #TODO: check for 24 Degrees Cel then send email then receive then turn on if yes, keep it off otherwise, it has a timer of 1 minute for the reply
 @app.callback(
-    Output('fan_frame', 'n_intervals'),
+    [Output('fan_frame', 'n_intervals'),Output('fan', 'src'),Output('fan-on-and-off', 'className')],
     [Input('temperature', 'value'), Input('fan_frame', 'n_intervals')]
 )
-def updateFan(temp, n):
+def updateFan(temp, n_intervals):
     global not_sent
     print(not_sent)
-    print(n)
-    if temp >= 24 and n >= 60 and not_sent:
+    print(n_intervals)
+    if (n_intervals <= 60 and not not_sent):
+        not_sent=1
+    if temp >= 24 and n_intervals >= 60 and not_sent:
         not_sent=0
         print('hello')
         # Send email
@@ -154,17 +156,17 @@ def updateFan(temp, n):
         print(response_received)
         if response_received:
             # User replied "yes", turn on the motor
+            print('on')
             DC.turn_on()
-            switchFan(1)
-            return 0
+            return [0, LED_ON, 'toggleOn']
         else:
             # User did not reply or replied "no", turn off the motor
+            print('off')
             DC.turn_off()
-            switchFan(0)
-            return 0
-    if (n <= 60 and not not_sent):
-        not_sent=1
-    return n
+            return [0,LED_OFF, 'toggleOff']
+    print(n_intervals)
+    DC.turn_off()
+    return [n_intervals,LED_OFF, 'toggleOff']
 
 if __name__ == '__main__':
     # this is a theory but
