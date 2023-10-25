@@ -28,7 +28,7 @@ class Email:
     
 
     def __init__(self):
-        return
+        pass
     def send(self):
         try:
             # Connect to the server
@@ -53,4 +53,4 @@ class Email:
             
     # method for receiving here
     def receive(self):
-        return
+        pass

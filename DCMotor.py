@@ -15,8 +15,8 @@ class DCMotor:
     # methods for turning on and off here
     def turn_on(self):
         #CODE HERE
-        print('testing DC')
+        pass
 
     def turn_off(self):
         #CODE HERE
-        print('testing DC')
+        pass

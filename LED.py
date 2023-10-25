@@ -14,4 +14,4 @@ class LED:
 
     def turn_off(self):
         # GPIO.output(self.pin, GPIO.LOW)
-        print('off')        
+        print('off')

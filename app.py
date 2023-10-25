@@ -55,10 +55,9 @@ app.layout = html.Div([
             ),
             dcc.Interval(
                 id='dht_frame',
-                interval=500,
+                interval=1000,
                 n_intervals=0,
             )
-            # html.Button(children='Switch', n_clicks=0, id='button-on-and-off'),
         ],className="card"),
         html.Div(children=[
             daq.Gauge(
@@ -80,7 +79,6 @@ app.layout = html.Div([
                     }
                 }
             ),
-            # html.Button(children='Switch', n_clicks=0, id='button-on-and-off'),
         ],className="card"),
         html.Div(children=[
             html.Img(id='fan', src=LED_OFF),
@@ -88,8 +86,7 @@ app.layout = html.Div([
             dcc.Interval(
                 id='fan_frame',
                 interval=1000,
-                n_intervals=0,
-                max_intervals=60000
+                n_intervals=0
             ),
         ],className="card"),
     ],className='main'),
@@ -99,7 +96,7 @@ app.layout = html.Div([
     [Output('bulb', 'src'),Output('light-on-and-off', 'className')],
     Input('light-on-and-off', 'n_clicks')
 )
-def update_LED (n_clicks):
+def updateLED (n_clicks):
     click = n_clicks % 2
     if click:
         LED.turn_on()
@@ -113,16 +110,15 @@ def update_LED (n_clicks):
         Input('dht_frame','n_intervals')
 )
 def updateDHT(n):
-    if(n % 2 == 0):
-        # return DHT11.read()
-        return [(n / 3), n] # tresting
-    return
-    
+    # return DHT11.read()
+    return [(n / 3), n]
+
+# live checking to turn on and off dc motor here
 @app.callback(
         [Output('fan', 'src'),Output('fan-on-and-off', 'className')],
         Input('fan-on-and-off', 'n_clicks')
 )
-def update_FAN(n_clicks):
+def switchFan(n_clicks):
     click = n_clicks % 2
     if click:
         # DC Turn on for testing
@@ -133,8 +129,14 @@ def update_FAN(n_clicks):
 
 # live checking to turn on and off dc motor here
 #TODO: check for 24 Degrees Cel then send email then receive then turn on if yes, keep it off otherwise, it has a timer of 1 minute for the reply
-def turnFan():
-    return
+@app.callback(
+    [Output('fan', 'src'),Output('fan-on-and-off', 'className')],
+    [Input('temperature', 'value'), Input('fan_frame', 'n_intervals')]
+)
+def updateFan(temp, n):
+    # if temp >= 24:
+        # 
+    pass
 
 if __name__ == '__main__':
     # this is a theory but
