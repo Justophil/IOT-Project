@@ -14,9 +14,21 @@ class DCMotor:
 
     # methods for turning on and off here
     def turn_on(self):
-        #CODE HERE
+        # GPIO.output(self.enable, 1)
+        # GPIO.output(self.input1, 0)
+        # GPIO.output(self.input2, 1)
+
+        # GPIO.output(self.enable, 1)
+        # GPIO.output(self.input1, 1)
+        # GPIO.output(self.input2, 0)
         pass
 
     def turn_off(self):
-        #CODE HERE
+        # GPIO.output(self.enable, 1)
+        # GPIO.output(self.input1, 1)
+        # GPIO.output(self.input2, 1)
+
+        # GPIO.output(self.enable, 1)
+        # GPIO.output(self.input1, 0)
+        # GPIO.output(self.input2, 0)
         pass

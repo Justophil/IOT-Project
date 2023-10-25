@@ -1,9 +1,4 @@
-# import RPi.GPIO as GPIO
 # import Freenove_DHT as DHT
-import time as sleep
-
-# GPIO.setwarnings(False)
-# GPIO.setmode(GPIO.BOARD)
 
 class DHT11:
     def __init__(self, pin):

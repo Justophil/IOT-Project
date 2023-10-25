@@ -1,5 +1,7 @@
 import smtplib
 import ssl
+import imaplib
+import email
 
 class Email:
     # Setup port number and servr name
@@ -24,8 +26,6 @@ class Email:
     simple_email_context = ssl.create_default_context()
 
     # -----------------------------------------------------------------
-
-    
 
     def __init__(self):
         pass
@@ -53,4 +53,51 @@ class Email:
             
     # method for receiving here
     def receive(self):
-        pass
+        try:
+            # Connect to the server
+            print("Connecting to server...")
+            TIE_server = imaplib.IMAP4_SSL(self.smtp_server)
+            TIE_server.login(self.email_to, self.pswd)
+            print("Connected to server")
+
+            # Select the inbox folder
+            TIE_server.select("inbox")
+
+            # Search for emails to the receiver's email address
+            _, data = TIE_server.search(None, f'(TO "{self.email_to}")')
+
+            # Get the list of email IDs
+            email_ids = data[0].split()
+
+            # Get the latest email
+            latest_email_id = email_ids[-1]
+
+            # Fetch the email data
+            _, email_data = TIE_server.fetch(latest_email_id, "(RFC822)")
+
+            # Parse the email content
+            raw_email = email_data[0][1]
+            email_message = email.message_from_bytes(raw_email)
+
+            # Check if the email subject and body contain "yes"
+            subject = email_message["Subject"]
+            body = ""
+            if email_message.is_multipart():
+                for part in email_message.get_payload():
+                    if part.get_content_type() == "text/plain":
+                        body = part.get_payload(decode=True).decode()
+                        break
+            else:
+                body = email_message.get_payload(decode=True).decode()
+
+            print(f"Received email - Subject: {subject}, Body: {body}")
+            
+            return "yes" in subject.lower() or "yes" in body.lower()
+
+        except Exception as e:
+            print(e)
+            return False
+
+        finally:
+            # Close the connection
+            TIE_server.logout()

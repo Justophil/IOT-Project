@@ -21,8 +21,7 @@ DC = DC.DCMotor(ENABLEDC, INPUT1DC, INPUT2DC)
 DHT11 = DHT11.DHT11(DHT11Pin)
 MAIL = MAIL.Email()
 
-temp=0;
-humid=0;
+not_sent=1
 
 app.layout = html.Div([
     html.Div(children=[
@@ -39,7 +38,7 @@ app.layout = html.Div([
                 id='temperature',
                 min=0,
                 max=40,
-                value=temp,
+                value=0,
                 className="icon",
                 showCurrentValue=True,
                 units="C",
@@ -65,7 +64,7 @@ app.layout = html.Div([
                 id='humidity',
                 min=0,
                 max=100,
-                value=humid,
+                value=0,
                 className="icon",
                 showCurrentValue=True,
                 units="%",
@@ -86,7 +85,7 @@ app.layout = html.Div([
             dcc.Interval(
                 id='fan_frame',
                 interval=1000,
-                n_intervals=0
+                n_intervals=60,
             ),
         ],className="card"),
     ],className='main'),
@@ -111,7 +110,7 @@ def updateLED (n_clicks):
 )
 def updateDHT(n):
     # return DHT11.read()
-    return [(n / 3), n]
+    return [n, n]
 
 # live checking to turn on and off dc motor here
 @app.callback(
@@ -122,21 +121,50 @@ def switchFan(n_clicks):
     click = n_clicks % 2
     if click:
         # DC Turn on for testing
+        DC.turn_on()
         return [LED_ON,'toggleOn']
     else:
         # DC Turn off for testing
+        DC.turn_off()
         return [LED_OFF,'toggleOff']
 
 # live checking to turn on and off dc motor here
 #TODO: check for 24 Degrees Cel then send email then receive then turn on if yes, keep it off otherwise, it has a timer of 1 minute for the reply
 @app.callback(
-    [Output('fan', 'src'),Output('fan-on-and-off', 'className')],
+    Output('fan_frame', 'n_intervals'),
     [Input('temperature', 'value'), Input('fan_frame', 'n_intervals')]
 )
 def updateFan(temp, n):
-    # if temp >= 24:
-        # 
-    pass
+    global not_sent
+    print(not_sent)
+    print(n)
+    if temp >= 24 and n >= 60 and not_sent:
+        not_sent=0
+        print('hello')
+        # Send email
+        MAIL.send()
+        print('email sent')
+        # Wait for the user's response
+        response_received = False
+        response_timer = 0
+        while not response_received and response_timer < 60:
+            # Receive email response
+            response_received = MAIL.receive()
+            response_timer += 1
+        print(response_received)
+        if response_received:
+            # User replied "yes", turn on the motor
+            DC.turn_on()
+            switchFan(1)
+            return 0
+        else:
+            # User did not reply or replied "no", turn off the motor
+            DC.turn_off()
+            switchFan(0)
+            return 0
+    if (n <= 60 and not not_sent):
+        not_sent=1
+    return n
 
 if __name__ == '__main__':
     # this is a theory but
