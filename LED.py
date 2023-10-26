@@ -10,8 +10,8 @@ class LED:
 
     def turn_on(self):
         # GPIO.output(self.pin, GPIO.HIGH)
-        print('on')
+        pass # only without the GPIO output
 
     def turn_off(self):
         # GPIO.output(self.pin, GPIO.LOW)
-        print('off')
+        pass # only without the GPIO output

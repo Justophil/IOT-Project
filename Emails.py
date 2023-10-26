@@ -20,7 +20,7 @@ class Email:
 
     The Temperature is above 24 Degrees Celsius.
     Would you like to turn on the fan?
-    if yes, reply to this email with a `yes`.
+    Please confirm your response in a reply to this email.
     """    
 
     simple_email_context = ssl.create_default_context()

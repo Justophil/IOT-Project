@@ -7,8 +7,11 @@ import DCMotor as DC
 
 app = Dash(__name__)
 
-LED_ON = '/assets/img/on.png'
-LED_OFF = '/assets/img/off.png'
+LED_ON = '/assets/img/led_on.png'
+LED_OFF = '/assets/img/led_off.png'
+FAN_ON = '/assets/img/fan_on.png'
+FAN_OFF = '/assets/img/fan_off.png'
+
 
 LEDPin=23
 DHT11Pin=18 #! BOARD PIN
@@ -22,6 +25,7 @@ DHT11 = DHT11.DHT11(DHT11Pin)
 MAIL = MAIL.Email()
 
 not_sent=1
+has_replied=0
 fan_status=0
 
 app.layout = html.Div([
@@ -30,7 +34,7 @@ app.layout = html.Div([
     ], className="header"),
     html.Div(children=[
         html.Div(children=[
-            html.Img(id='bulb', src=LED_OFF),
+            html.Img(id='bulb', src=LED_OFF, className="icon"),
             html.Button(children='Switch', n_clicks=0, id='light-on-and-off'),
         ],className="card"),
         html.Div(children=[
@@ -81,18 +85,13 @@ app.layout = html.Div([
             ),
         ],className="card"),
         html.Div(children=[
-            html.Img(id='fan', src=LED_OFF),
-            # html.Button(children='Switch', n_clicks=0, id='fan-on-and-off'),
-            # dcc.Interval(
-            #     id='fan_frame',
-            #     interval=1000,
-            #     n_intervals=60,
-            # ),
+            html.Img(id='fan', src=FAN_OFF, className="icon"),
         ],className="card"),
     ],className='main'),
 ])
+
+#Live checking for button input to turn on the LED or off
 @app.callback(
-    #adding an array means the input or output must contain an array
     [Output('bulb', 'src'),Output('light-on-and-off', 'className')],
     Input('light-on-and-off', 'n_clicks')
 )
@@ -106,42 +105,22 @@ def updateLED (n_clicks):
         return [LED_OFF,'toggleOff']
 # live checking for data change
 @app.callback(
-        [Output('temperature', 'value'), Output('humidity', 'value')],
-        Input('dht_frame','n_intervals')
+    [Output('temperature', 'value'), Output('humidity', 'value')],
+    Input('dht_frame','n_intervals')
 )
 def updateDHT(n):
     # return DHT11.read()
     return [n, n]
 
 # live checking to turn on and off dc motor here
-# @app.callback(
-#         [Output('fan', 'src'),Output('fan-on-and-off', 'className')],
-#         Input('fan-on-and-off', 'n_clicks')
-# )
-# def switchFan(n_clicks):
-#     click = n_clicks % 2
-#     if click:
-#         # DC Turn on for testing
-#         DC.turn_on()
-#         return [LED_ON,'toggleOn']
-#     else:
-#         # DC Turn off for testing
-#         DC.turn_off()
-#         return [LED_OFF,'toggleOff']
-
-# live checking to turn on and off dc motor here
-#TODO: check for 24 Degrees Cel then send email then receive then turn on if yes, keep it off otherwise, it has a timer of 1 minute for the reply
 @app.callback(
-    # [Output('fan_frame', 'n_intervals'),Output('fan', 'src'),Output('fan-on-and-off', 'className')],
-    # [Output('fan', 'src'),Output('fan-on-and-off', 'className')],
     [Output('fan', 'src')],
-    # [Input('temperature', 'value'), Input('fan_frame', 'n_intervals')]
     [Input('temperature', 'value')]
 )
 def updateFan(temp):
     global not_sent
     global fan_status
-    print(not_sent)
+    global has_replied
     if (temp < 24 and not not_sent):
         not_sent=1
     if temp >= 24 and not_sent:
@@ -152,38 +131,34 @@ def updateFan(temp):
         # Wait for the user's response
         response_received = False
         response_timer = 0
-        while not response_received and response_timer < 60:
+        while not response_received and response_timer < 60 and not has_replied:
             # Receive email response
             response_received = MAIL.receive()
             response_timer += 1
         print(response_received)
         if response_received:
             # User replied "yes", turn on the motor
+            has_replied=1
             print('on')
             DC.turn_on()
             fan_status = 1
-            # return [0, LED_ON, 'toggleOn']
-            # return [LED_ON, 'toggleOn']
-            return [LED_ON]
+            return [FAN_ON]
         else:
-            # User did not reply or replied "no", turn off the motor
+            # User did not reply or replied "yes", turn off the motor
+            has_replied=1
             print('off')
             DC.turn_off()
             fan_status = 0
-            # return [0,LED_OFF, 'toggleOff']
-            # return [LED_OFF, 'toggleOff']
-            return [LED_OFF]
+            return [FAN_OFF]
+        
     if fan_status and temp >= 24:
-        return [LED_ON]
+        return [FAN_ON]
     elif temp < 24 or not fan_status:
+        if temp < 24:
+            has_replied=0
         fan_status = 0
         DC.turn_off()
-        return [LED_OFF]
-
-    # DC.turn_off()
-    # # return [n_intervals,LED_OFF, 'toggleOff']
-    # # return [LED_OFF, 'toggleOff']
-    # return [LED_OFF]
+        return [FAN_OFF]
 
 if __name__ == '__main__':
     # this is a theory but
