@@ -27,8 +27,8 @@ class Email:
 
     # -----------------------------------------------------------------
     
-    reply_email = 0;
-    original_email = 0;
+    reply_email = 0
+    original_email = 0
 
     def __init__(self):
         pass
