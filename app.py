@@ -135,18 +135,15 @@ def updateFan(temp):
             # Receive email response
             response_received = MAIL.receive()
             response_timer += 1
-        print(response_received)
+            if MAIL.original_email <= MAIL.reply_email:
+                has_replied=1
         if response_received:
             # User replied "yes", turn on the motor
-            has_replied=1
-            print('on')
             DC.turn_on()
             fan_status = 1
             return [FAN_ON]
         else:
             # User did not reply or replied "yes", turn off the motor
-            has_replied=1
-            print('off')
             DC.turn_off()
             fan_status = 0
             return [FAN_OFF]

@@ -26,6 +26,9 @@ class Email:
     simple_email_context = ssl.create_default_context()
 
     # -----------------------------------------------------------------
+    
+    reply_email = 0;
+    original_email = 0;
 
     def __init__(self):
         pass
@@ -86,12 +89,13 @@ class Email:
                 for part in email_message.get_payload():
                     if part.get_content_type() == "text/plain":
                         body = part.get_payload(decode=True).decode()
+                        self.reply_email = len(body)
                         break
             else:
                 body = email_message.get_payload(decode=True).decode()
+                self.original_email = len(body)
 
             print(f"Received email - Subject: {subject}, Body: {body}")
-            
             return "yes" in subject.lower() or "yes" in body.lower()
 
         except Exception as e:
