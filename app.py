@@ -135,7 +135,7 @@ def updateFan(temp):
             # Receive email response
             response_received = MAIL.receive()
             response_timer += 1
-            if MAIL.original_email <= MAIL.reply_email:
+            if MAIL.original_email < MAIL.reply_email:
                 has_replied=1
         if response_received:
             # User replied "yes", turn on the motor
