@@ -12,7 +12,6 @@ LED_OFF = '/assets/img/led_off.png'
 FAN_ON = '/assets/img/fan_on.png'
 FAN_OFF = '/assets/img/fan_off.png'
 
-
 LEDPin=23
 DHT11Pin=18 #! BOARD PIN
 ENABLEDC=17
@@ -109,8 +108,8 @@ def updateLED (n_clicks):
     Input('dht_frame','n_intervals')
 )
 def updateDHT(n):
-    # return DHT11.read()
-    return [n, n]
+    return DHT11.read()
+    # return [n, n]
 
 # live checking to turn on and off dc motor here
 @app.callback(
