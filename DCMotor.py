@@ -8,9 +8,9 @@ class DCMotor:
         self.enable = enable
         self.input1 = input1
         self.input2 = input2
-        GPIO.setup(enable, GPIO.OUT, initial=GPIO.LOW)
-        GPIO.setup(input1, GPIO.OUT, initial=GPIO.LOW)
-        GPIO.setup(input2, GPIO.OUT, initial=GPIO.LOW)
+        GPIO.setup(enable, GPIO.OUT)
+        GPIO.setup(input1, GPIO.OUT)
+        GPIO.setup(input2, GPIO.OUT)
 
     # methods for turning on and off here
     def turn_on(self):

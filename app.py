@@ -13,7 +13,7 @@ FAN_ON = '/assets/img/fan_on.png'
 FAN_OFF = '/assets/img/fan_off.png'
 
 LEDPin=23
-DHT11Pin=18 #! BOARD PIN
+DHT11Pin=24
 ENABLEDC=17
 INPUT1DC=22
 INPUT2DC=27
@@ -110,8 +110,9 @@ def updateLED (n_clicks):
 )
 def updateDHT(n):
     global tempera
-    tempera = DHT11.read()[0]
-    return DHT11.read()
+    temp = DHT11.read()
+    tempera = temp[0]
+    return temp
     # tempera = 24.5
     # return [n, n]
 

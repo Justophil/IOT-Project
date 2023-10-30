@@ -26,7 +26,6 @@ class Email:
     def __init__(self):
         pass
     def setMessage(self, temp):
-        print(temp)
         self.message = """From: From IOT-Dashboard <iotdashboard@iotDash.com>
         To: Phil <phildschool@gmail.com>
         Subject: Notice! the room is getting hot
