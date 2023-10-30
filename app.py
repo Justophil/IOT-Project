@@ -26,6 +26,7 @@ MAIL = MAIL.Email()
 not_sent=1
 has_replied=0
 fan_status=0
+tempera=0
 
 app.layout = html.Div([
     html.Div(children=[
@@ -108,7 +109,10 @@ def updateLED (n_clicks):
     Input('dht_frame','n_intervals')
 )
 def updateDHT(n):
+    global tempera
+    tempera = DHT11.read()[0]
     return DHT11.read()
+    # tempera = 24.5
     # return [n, n]
 
 # live checking to turn on and off dc motor here
@@ -120,10 +124,12 @@ def updateFan(temp):
     global not_sent
     global fan_status
     global has_replied
-    if (temp < 24 and not not_sent):
+    global tempera
+    if (temp <= 24 and not not_sent):
         not_sent=1
-    if temp >= 24 and not_sent:
+    if temp > 24 and not_sent:
         not_sent=0
+        MAIL.setMessage(tempera)
         # Send email
         MAIL.send()
         print('email sent')
@@ -147,10 +153,10 @@ def updateFan(temp):
             fan_status = 0
             return [FAN_OFF]
         
-    if fan_status and temp >= 24:
+    if fan_status and temp > 24:
         return [FAN_ON]
-    elif temp < 24 or not fan_status:
-        if temp < 24:
+    elif temp <= 24 or not fan_status:
+        if temp <= 24:
             has_replied=0
         fan_status = 0
         DC.turn_off()

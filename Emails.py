@@ -14,14 +14,7 @@ class Email:
 
     pswd = 'vjty nkvt olic dvsd'
 
-    message = """From: From IOT-Dashboard <iotdashboard@iotDash.com>
-    To: Phil <phildschool@gmail.com>
-    Subject: Notice! the room is getting hot
-
-    The Temperature is above 24 Degrees Celsius.
-    Would you like to turn on the fan?
-    Please confirm your response in a reply to this email.
-    """    
+    message = ""    
 
     simple_email_context = ssl.create_default_context()
 
@@ -32,6 +25,17 @@ class Email:
 
     def __init__(self):
         pass
+    def setMessage(self, temp):
+        print(temp)
+        self.message = """From: From IOT-Dashboard <iotdashboard@iotDash.com>
+        To: Phil <phildschool@gmail.com>
+        Subject: Notice! the room is getting hot
+
+        The Temperature is """ + str(temp) + """ Degrees Celsius.
+        Would you like to turn on the fan?
+        Please confirm your response in a reply to this email.
+        """
+        
     def send(self):
         try:
             # Connect to the server
