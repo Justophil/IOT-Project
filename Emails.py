@@ -26,7 +26,7 @@ class Email:
 
     def __init__(self):
         pass
-    def setMessage(self, temp):
+    def setMessages(self, temp):
         self.message = """From: From IOT-Dashboard <iotdashboard@iotDash.com>
         To: Client <""" + self.email_to + """>
         Subject: Notice! the room is getting hot
@@ -39,10 +39,10 @@ class Email:
         To: Client <""" + self.email_to + """>
         Subject: Notification!
 
-        notif message
+        The Light is ON at 'hh:mm' time.
         """
         
-    def send(self):
+    def send(self,option):
         try:
             # Connect to the server
             print("Connecting to server...")
@@ -53,7 +53,10 @@ class Email:
             
             # Send the actual email
             print(f"Sending email to - {self.email_to}")
-            TIE_server.sendmail(self.email_from, self.email_to, self.message)
+            if(option == "message"):
+                TIE_server.sendmail(self.email_from, self.email_to, self.message)
+            if(option == "notification"):
+                TIE_server.sendmail(self.email_from, self.email_to, self.notification)
             print(f"Email successfully sent to - {self.email_to}")
 
         # If there's an error, print it out

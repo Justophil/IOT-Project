@@ -99,6 +99,7 @@ def updateLED (n_clicks):
     click = n_clicks % 2
     if click:
         LED.turn_on()
+        MAIL.send("notification") # Testing
         return [LED_ON,'toggleOn']
     else:
         LED.turn_off()
@@ -130,9 +131,9 @@ def updateFan(temp):
         not_sent=1
     if temp > 24 and not_sent:
         not_sent=0
-        MAIL.setMessage(tempera)
+        MAIL.setMessages(tempera)
         # Send email
-        MAIL.send()
+        MAIL.send("message")
         print('email sent')
         # Wait for the user's response
         response_received = False

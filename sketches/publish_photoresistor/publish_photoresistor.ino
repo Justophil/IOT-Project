@@ -13,6 +13,7 @@ WiFiClient vanieriot;
 PubSubClient client(vanieriot);
 
 const int pResistor = A0;
+const int led = 2;
 int value;
 
 void setup_wifi() {
@@ -59,6 +60,8 @@ void reconnect() {
 void setup() {
   Serial.begin(115200);
   pinMode(pResistor, INPUT);
+  pinMode(led,OUTPUT);
+  digitalWrite(led, LOW);
   setup_wifi();
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
@@ -71,6 +74,12 @@ void loop() {
   if(!client.loop())
     client.connect("vanieriot");
   value = analogRead(pResistor);
+  if(value < 400) {
+   digitalWrite(led, HIGH);
+  }
+  else {
+    digitalWrite(led, LOW);
+  }
   client.publish("LightIntensity", str(value));
   delay(1000);
 }
