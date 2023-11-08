@@ -9,12 +9,13 @@ class Email:
     smtp_port = 587                 # Standard secure SMTP port
     smtp_server = "smtp.gmail.com"  # Google SMTP Server
 
-    email_from = "phildschool@gmail.com"
+    email_from = "noreply.iotboard.pyt.ard@gmail.com"
     email_to = "phildschool@gmail.com"
 
-    pswd = 'vjty nkvt olic dvsd'
+    pswd = 'itmd vfwu sywq tiix'
 
-    message = ""    
+    message = ""
+    notification = ""
 
     simple_email_context = ssl.create_default_context()
 
@@ -27,12 +28,18 @@ class Email:
         pass
     def setMessage(self, temp):
         self.message = """From: From IOT-Dashboard <iotdashboard@iotDash.com>
-        To: Phil <phildschool@gmail.com>
+        To: Client <""" + self.email_to + """>
         Subject: Notice! the room is getting hot
 
         The Temperature is """ + str(temp) + """ Degrees Celsius.
         Would you like to turn on the fan?
         Please confirm your response in a reply to this email.
+        """
+        self.notification = """From: From IOT-Dashboard <iotdashboard@iotDash.com>
+        To: Client <""" + self.email_to + """>
+        Subject: Notification!
+
+        notif message
         """
         
     def send(self):
