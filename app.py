@@ -35,7 +35,7 @@ app.layout = html.Div([
     html.Div(children=[
         html.Div(children=[
             html.Img(id='bulb', src=LED_OFF, className="icon"),
-            html.Button(children='Switch', n_clicks=0, id='light-on-and-off'),
+            html.Button(children='Switch', n_clicks=0, id='light-on-and-off', disabled=True),
         ],className="card"),
         html.Div(children=[
             daq.Gauge(
@@ -87,6 +87,16 @@ app.layout = html.Div([
         html.Div(children=[
             html.Img(id='fan', src=FAN_OFF, className="icon"),
         ],className="card"),
+        html.Div(children=[
+            html.Img(id='light-intensity', src=LED_OFF, className="icon"),
+            html.h3(id="light-intensity-label", ),
+            dcc.Slider(),
+            dcc.Interval(
+                id='light_intensity_frame',
+                interval=1000,
+                n_intervals=0,
+            )
+        ],className="card")
     ],className='main'),
 ])
 
@@ -99,7 +109,6 @@ def updateLED (n_clicks):
     click = n_clicks % 2
     if click:
         LED.turn_on()
-        MAIL.send("notification") # Testing
         return [LED_ON,'toggleOn']
     else:
         LED.turn_off()
@@ -163,6 +172,20 @@ def updateFan(temp):
         fan_status = 0
         DC.turn_off()
         return [FAN_OFF]
+@app.callback(
+    Output('light-intensity-label', 'children'),
+    Input('light_intensity_frame', 'n_intervals')
+)
+def updateIntensity(n_intervals):
+    if():
+    MAIL.send("notification") # Testing
+    
+@app.callback(
+    Output('light-intensity', 'src'),
+    Input('light-intensity-label', 'children')
+)
+def updateLight():
+    if():
 
 if __name__ == '__main__':
     # this is a theory but
