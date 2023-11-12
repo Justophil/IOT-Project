@@ -73,13 +73,14 @@ void loop() {
   }
   if(!client.loop())
     client.connect("vanieriot");
-  value = analogRead(pResistor);
+  int value = analogRead(pResistor);
   if(value < 400) {
    digitalWrite(led, HIGH);
   }
   else {
     digitalWrite(led, LOW);
   }
-  client.publish("LightIntensity", str(value));
+  String val = str(value);
+  client.publish("LightIntensity", val.c_str());
   delay(1000);
 }

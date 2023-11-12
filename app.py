@@ -4,6 +4,7 @@ import LED
 import DHT11
 import Emails as MAIL
 import DCMotor as DC
+import Mqtt as MQTT
 
 app = Dash(__name__)
 
@@ -22,16 +23,29 @@ LED = LED.LED(LEDPin)
 DC = DC.DCMotor(ENABLEDC, INPUT1DC, INPUT2DC)
 DHT11 = DHT11.DHT11(DHT11Pin)
 MAIL = MAIL.Email()
+MQTT = MQTT.Mqtt()
 
 not_sent=1
 has_replied=0
 fan_status=0
 tempera=0
-
+light_status=0
+light=0
+sent_notification=0
+timer=0
+maxTimer=0
 app.layout = html.Div([
     html.Div(children=[
         html.H1('Dashboard'),
     ], className="header"),
+    html.Div(children=[
+        html.H3(children="Note: A notification has been sent to you by email"),
+        dcc.Interval(
+                id="notif-frame",
+                interval=1000,
+                n_intervals=0
+            )
+    ],id="notif-card",className="notif",hidden=True),
     html.Div(children=[
         html.Div(children=[
             html.Img(id='bulb', src=LED_OFF, className="icon"),
@@ -89,8 +103,8 @@ app.layout = html.Div([
         ],className="card"),
         html.Div(children=[
             html.Img(id='light-intensity', src=LED_OFF, className="icon"),
-            html.h3(id="light-intensity-label", ),
-            dcc.Slider(),
+            html.H3(id="light-intensity-label", children=0),
+            dcc.Slider(0,1000,100,value=0,id="intensity-slider"),
             dcc.Interval(
                 id='light_intensity_frame',
                 interval=1000,
@@ -143,7 +157,6 @@ def updateFan(temp):
         MAIL.setMessages(tempera)
         # Send email
         MAIL.send("message")
-        print('email sent')
         # Wait for the user's response
         response_received = False
         response_timer = 0
@@ -173,19 +186,55 @@ def updateFan(temp):
         DC.turn_off()
         return [FAN_OFF]
 @app.callback(
-    Output('light-intensity-label', 'children'),
+    [Output('light-intensity-label', 'children'), Output('intensity-slider', 'value')],
     Input('light_intensity_frame', 'n_intervals')
 )
 def updateIntensity(n_intervals):
-    if():
-    MAIL.send("notification") # Testing
+    MQTT.subscribe()
+    intensity = MQTT.data['light']
+    print(intensity)
+    return [intensity, intensity]
     
 @app.callback(
     Output('light-intensity', 'src'),
     Input('light-intensity-label', 'children')
 )
-def updateLight():
-    if():
+def updateLight(intensity):
+    global sent_notification
+    if(intensity < 400):
+        MAIL.send("notification")
+        sent_notification = 1
+        light_status = 1
+        LED.turn_on()
+        return [LED_ON]
+    else:
+        LED.turn_off()
+        return [LED_OFF]
+    # if(light_status):
+    #     LED.turn_on()
+    #     return [LED_ON]
+    # else:
+    #     LED.turn_off()
+    #     return [LED_OFF]
+@app.callback(
+    Output('notif-card', 'hidden'),
+    Input('notif-frame', 'n_intervals')
+)
+def updateNotif(n_intervals):
+    global timer
+    global maxTimer
+    if(sent_notification and timer == 0):
+        timer+=n_intervals
+        maxTimer+=(n_intervals + 10)
+        return False
+    if(timer <= maxTimer and timer != maxTimer):
+        timer+=1
+        return False
+    else:
+        sent_notification=0
+        timer=0
+        maxTimer=0
+        return True
 
 if __name__ == '__main__':
     # this is a theory but
