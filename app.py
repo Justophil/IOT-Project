@@ -26,6 +26,7 @@ MAIL = MAIL.Email()
 MQTT = MQTT.Mqtt()
 
 not_sent=1
+not_sent2=1
 has_replied=0
 fan_status=0
 tempera=0
@@ -38,18 +39,18 @@ app.layout = html.Div([
     html.Div(children=[
         html.H1('Dashboard'),
     ], className="header"),
-    html.Div(children=[
-        html.H3(children="Note: A notification has been sent to you by email"),
-        dcc.Interval(
+    dcc.Interval(
                 id="notif-frame",
                 interval=1000,
                 n_intervals=0
-            )
+            ),
+    html.Div(children=[
+        html.H3("Note: A notification has been sent to you by email"),
     ],id="notif-card",className="notif",hidden=True),
     html.Div(children=[
         html.Div(children=[
             html.Img(id='bulb', src=LED_OFF, className="icon"),
-            html.Button(children='Switch', n_clicks=0, id='light-on-and-off', disabled=True),
+            html.Button(children='Switch', n_clicks=0, id='light-on-and-off'),
         ],className="card"),
         html.Div(children=[
             daq.Gauge(
@@ -103,8 +104,8 @@ app.layout = html.Div([
         ],className="card"),
         html.Div(children=[
             html.Img(id='light-intensity', src=LED_OFF, className="icon"),
-            html.H3(id="light-intensity-label", children=0),
-            dcc.Slider(0,1000,100,value=0,id="intensity-slider"),
+            html.H3(id="light-intensity-label", children=123),
+            daq.Slider(min=0,max=1000,value=0,id="intensity-slider",size=200),
             dcc.Interval(
                 id='light_intensity_frame',
                 interval=1000,
@@ -187,13 +188,14 @@ def updateFan(temp):
         return [FAN_OFF]
 @app.callback(
     [Output('light-intensity-label', 'children'), Output('intensity-slider', 'value')],
+    # Output('light-intensity-label', 'children'),
     Input('light_intensity_frame', 'n_intervals')
 )
 def updateIntensity(n_intervals):
-    MQTT.subscribe()
-    intensity = MQTT.data['light']
-    print(intensity)
+    intensity = int(MQTT.data)
+    # print(intensity)
     return [intensity, intensity]
+    # return intensity
     
 @app.callback(
     Output('light-intensity', 'src'),
@@ -201,15 +203,14 @@ def updateIntensity(n_intervals):
 )
 def updateLight(intensity):
     global sent_notification
+    global light_status
     if(intensity < 400):
-        MAIL.send("notification")
         sent_notification = 1
-        light_status = 1
-        LED.turn_on()
-        return [LED_ON]
+        return LED_ON
     else:
-        LED.turn_off()
-        return [LED_OFF]
+        sent_notification=0
+        light_status=0
+        return LED_OFF
     # if(light_status):
     #     LED.turn_on()
     #     return [LED_ON]
@@ -223,15 +224,23 @@ def updateLight(intensity):
 def updateNotif(n_intervals):
     global timer
     global maxTimer
-    if(sent_notification and timer == 0):
+    global sent_notification
+    global not_sent2
+    global light_status
+    if(sent_notification and (timer == 0) and not light_status):
         timer+=n_intervals
         maxTimer+=(n_intervals + 10)
+        light_status = 1
         return False
     if(timer <= maxTimer and timer != maxTimer):
+        if(not_sent2):
+            not_sent2=0  
+            MAIL.setMessages(0)
+            MAIL.send("notification")      
         timer+=1
         return False
     else:
-        sent_notification=0
+        not_sent2=1
         timer=0
         maxTimer=0
         return True
@@ -242,4 +251,5 @@ if __name__ == '__main__':
     # you can connect to the website from that device
     # app.run(host='0.0.0.0',debug=True)
     # this is if you want to run it on your current device
+    MQTT.run()
     app.run(debug=True)

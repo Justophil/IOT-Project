@@ -2,17 +2,20 @@ import smtplib
 import ssl
 import imaplib
 import email
+import datetime
+from time import gmtime, strftime
 
 class Email:
-    # Setup port number and servr name
 
     smtp_port = 587                 # Standard secure SMTP port
     smtp_server = "smtp.gmail.com"  # Google SMTP Server
 
-    email_from = "noreply.iotboard.pyt.ard@gmail.com"
+    # email_from = "noreply.iotboard.pyt.ard@gmail.com"
+    email_from = "phildschool@gmail.com"
     email_to = "phildschool@gmail.com"
 
-    pswd = 'itmd vfwu sywq tiix'
+    # pswd = 'itmd vfwu sywq tiix'
+    pswd = 'vjty nkvt olic dvsd'
 
     message = ""
     notification = ""
@@ -26,6 +29,7 @@ class Email:
 
     def __init__(self):
         pass
+    
     def setMessages(self, temp):
         self.message = """From: From IOT-Dashboard <iotdashboard@iotDash.com>
         To: Client <""" + self.email_to + """>
@@ -39,8 +43,10 @@ class Email:
         To: Client <""" + self.email_to + """>
         Subject: Notification!
 
-        The Light is ON at 'hh:mm' time.
+        The Light is ON at """ + str(datetime.datetime.now()) + """ time.
         """
+        # strftime("%Y-%m-%d %H:%M:%S", gmtime())
+        # datetime.datetime.now()
         
     def send(self,option):
         try:

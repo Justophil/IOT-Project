@@ -5,20 +5,19 @@
 // const char* password = "14730078";
 // const char* mqtt_server = "192.168.0.144";
 
-const char* ssid = "TP-Link_2AD8";
-const char* password = "14730078";
-const char* mqtt_server = "192.168.0.144";
+const char* ssid = "iPhone a Philip";
+const char* password = "edpo1s0kp8ty1";
+const char* mqtt_server = "172.20.10.3";
 
 WiFiClient vanieriot;
 PubSubClient client(vanieriot);
 
 const int pResistor = A0;
-const int led = 2;
+const int led = D0;
 int value;
 
 void setup_wifi() {
    delay(10);
-   // We start by connecting to a WiFi network
    Serial.println();
    Serial.print("Connecting to ");
    Serial.println(ssid);
@@ -52,7 +51,6 @@ void reconnect() {
        Serial.print("failed, rc=");
        Serial.print(client.state());
        Serial.println(" try again in 3 seconds");
-       // Wait 3 seconds before retrying
        delay(3000);
      }
    }
@@ -75,12 +73,14 @@ void loop() {
     client.connect("vanieriot");
   int value = analogRead(pResistor);
   if(value < 400) {
-   digitalWrite(led, HIGH);
+    digitalWrite(led, HIGH);
   }
   else {
     digitalWrite(led, LOW);
   }
-  String val = str(value);
+  String val = String(value);
+  Serial.println(value);
+  Serial.println(val);
   client.publish("LightIntensity", val.c_str());
   delay(1000);
 }
