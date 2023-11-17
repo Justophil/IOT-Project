@@ -10,4 +10,3 @@ class DHT11:
         if (chk is not dht.DHTLIB_OK): #read DHT11 and get a return value. Then determine whether data read is normal according to the return value.
             pass
         return [dht.temperature,dht.humidity]
-        # pass # only without the GPIO output

@@ -21,7 +21,6 @@ class DCMotor:
         # GPIO.output(self.enable, 1)
         # GPIO.output(self.input1, 1)
         # GPIO.output(self.input2, 0)
-        # pass # only without the GPIO output
 
     def turn_off(self):
         GPIO.output(self.enable, 1)
@@ -31,4 +30,3 @@ class DCMotor:
         # GPIO.output(self.enable, 1)
         # GPIO.output(self.input1, 0)
         # GPIO.output(self.input2, 0)
-        # pass # only without the GPIO output
