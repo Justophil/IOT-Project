@@ -23,7 +23,8 @@ class SQLite:
         name text,
         temp_thr real,
         humid_thr real,
-        lightintensity_thr real
+        lightintensity_thr real,
+        PRIMARY KEY(user_id)
       )
     ''')
     SQLite.conn.commit()
@@ -77,14 +78,28 @@ class SQLite:
     ''', [self.user_id])
     SQLite.conn.commit()
     return SQLite.cur.fetchone()
+  
+  def getAll(self):
+    if (not self.isConnected()):
+      return False
+    SQLite.cur.execute('''
+      SELECT * FROM user
+    ''')
+    SQLite.conn.commit()
+    return SQLite.cur.fetchall()
 
   def close(self):
     SQLite.conn.close()
 
 
 if __name__ == '__main__':
-  user = SQLite(1, 'user', 20, 20, 20)
+  user = SQLite(2, 'user', 20, 20, 20)
   user.connect()
-  user.createUser()
-  data = user.getUser()
+  if(user.getUser() == None):
+    user.createUser()
+  # user.name = 'name'
+  # user.updateUser()
+  # user.deleteUser()
+  data = user.getAll()
+  # data = user.getUser()
   print(data)
