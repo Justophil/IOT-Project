@@ -32,6 +32,13 @@ h3 {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     color: #FFFFFF;
 }
+label {
+    text-align: center;
+    text-decoration-color: darkgrey;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 20.8;
+    color: #FFFFFF;
+}
 .main {
     display:flex;
     margin: 120px;
@@ -53,6 +60,24 @@ h3 {
     gap: 5px;
     box-shadow: 5px 5px 15px rgb(25, 25, 25);
 }
+
+.user-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;    
+    padding: 10px;
+    position: relative;
+    text-align: center;
+    align-items: center;
+    margin: 5px;
+    width: 650px;
+    height: 275px;
+    border-radius: 30px;
+    background: #212121;
+    gap: 5px;
+    box-shadow: 5px 5px 15px rgb(25, 25, 25);
+}
+
 .icon {
     position: relative;
     margin: 5px;

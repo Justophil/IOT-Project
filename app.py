@@ -25,6 +25,8 @@ DC = DC.DCMotor(ENABLEDC, INPUT1DC, INPUT2DC)
 DHT11 = DHT11.DHT11(DHT11Pin)
 MAIL = MAIL.Email()
 MQTT = MQTT.Mqtt()
+SQL = SQL.SQLite()
+SQL.connect()
 
 not_sent=1
 not_sent2=1
@@ -36,6 +38,10 @@ light=0
 sent_notification=0
 timer=0
 maxTimer=0
+temp_thr=24
+humid_thr=60
+lightintensity_thr=400
+user_id=""
 app.layout = html.Div([
     html.Div(children=[
         html.H1('Dashboard'),
@@ -49,6 +55,27 @@ app.layout = html.Div([
         html.H3("Note: A notification has been sent to you by email"),
     ],id="notif-card",className="notif",hidden=True),
     html.Div(children=[
+        html.Div(children=[
+            html.Label(children="ID:",className="user-label"),
+            html.Label(id="user-id",className="user-label"),
+            dcc.Interval(
+                id="user-id-frame",
+                interval=1000,
+                n_intervals=0
+            ),
+            html.Hr(),
+            html.Label(children="Name:",className="user-label"),
+            dcc.Input(id="user-name",type="text",placeholder="Name",className="user-input"),
+            html.Hr(),
+            html.Label(children="Temperature Threshold:",className="user-label"),
+            dcc.Input(id="user-temp",type="text",placeholder="Temperature",className="user-input"),
+            html.Hr(),
+            html.Label(children="Humidity Threshold:",className="user-label"),
+            dcc.Input(id="user-humid",type="text",placeholder="Humidity",className="user-input"),
+            html.Hr(),
+            html.Label(children="Light Intensity Threshold:",className="user-label"),
+            dcc.Input(id="user-light-intensity",type="text",placeholder="Light Intensity",className="user-input"),
+        ],className="user-card"),
         html.Div(children=[
             html.Img(id='bulb', src=LED_OFF, className="icon"),
             html.Button(children='Switch', n_clicks=0, id='light-on-and-off'),
@@ -152,9 +179,10 @@ def updateFan(temp):
     global fan_status
     global has_replied
     global tempera
-    if (temp <= 24 and not not_sent):
+    global temp_thr
+    if (temp <= temp_thr and not not_sent):
         not_sent=1
-    if temp > 24 and not_sent:
+    if temp > temp_thr and not_sent:
         not_sent=0
         MAIL.setMessages(tempera)
         # Send email
@@ -179,10 +207,10 @@ def updateFan(temp):
             fan_status = 0
             return [FAN_OFF]
         
-    if fan_status and temp > 24:
+    if fan_status and temp > temp_thr:
         return [FAN_ON]
-    elif temp <= 24 or not fan_status:
-        if temp <= 24:
+    elif temp <= temp_thr or not fan_status:
+        if temp <= temp_thr:
             has_replied=0
         fan_status = 0
         DC.turn_off()
@@ -204,7 +232,8 @@ def updateIntensity(n_intervals):
 def updateLight(intensity):
     global sent_notification
     global light_status
-    if(intensity < 400):
+    global lightintensity_thr
+    if(intensity < lightintensity_thr):
         sent_notification = 1
         return LED_ON
     else:
