@@ -44,102 +44,115 @@ lightintensity_thr=400
 user_id=""
 app.layout = html.Div([
     html.Div(children=[
-        html.H1('Dashboard'),
+        html.H2('Dashboard'),
     ], className="header"),
-    dcc.Interval(
-                id="notif-frame",
-                interval=1000,
-                n_intervals=0
-            ),
-    html.Div(children=[
-        html.H3("Note: A notification has been sent to you by email"),
-    ],id="notif-card",className="notif",hidden=True),
     html.Div(children=[
         html.Div(children=[
-            html.Label(children="ID:",className="user-label"),
-            html.Label(id="user-id",className="user-label"),
-            dcc.Interval(
-                id="user-id-frame",
-                interval=1000,
-                n_intervals=0
-            ),
-            html.Hr(),
-            html.Label(children="Name:",className="user-label"),
-            dcc.Input(id="user-name",type="text",placeholder="Name",className="user-input"),
-            html.Hr(),
-            html.Label(children="Temperature Threshold:",className="user-label"),
-            dcc.Input(id="user-temp",type="text",placeholder="Temperature",className="user-input"),
-            html.Hr(),
-            html.Label(children="Humidity Threshold:",className="user-label"),
-            dcc.Input(id="user-humid",type="text",placeholder="Humidity",className="user-input"),
-            html.Hr(),
-            html.Label(children="Light Intensity Threshold:",className="user-label"),
-            dcc.Input(id="user-light-intensity",type="text",placeholder="Light Intensity",className="user-input"),
-        ],className="user-card"),
+            html.Div(children=[
+                html.Div(children=[
+                    html.Img(src='',className="user-icon")
+                ], className='main-header-column'),
+                html.Div(children=[
+                    html.Label(children="ID:",className="user-label"),
+                    dcc.Interval(
+                        id="user-id-frame",
+                        interval=1000,
+                        n_intervals=0
+                    ),
+                    html.Label(children="Name:",className="user-label"),
+                    html.Label(children="Temperature Threshold:",className="user-label"),
+                    html.Label(children="Humidity Threshold:",className="user-label"),
+                    html.Label(children="Light Intensity Threshold:",className="user-label"),
+                ], className='main-header-column'),
+                html.Div(children=[
+                    html.Label(id="user-id",className="user-label"),
+                    dcc.Input(id="user-name",type="text",placeholder="Name",className="user-input"),
+                    dcc.Input(id="user-temp",type="text",placeholder="Temperature",className="user-input"),
+                    dcc.Input(id="user-humid",type="text",placeholder="Humidity",className="user-input"),
+                    dcc.Input(id="user-light-intensity",type="text",placeholder="Light Intensity",className="user-input"),
+                ], className='main-header-column'),
+                html.Div(children=[
+                    dcc.Interval(
+                        id="notif-frame",
+                        interval=1000,
+                        n_intervals=0
+                    ),
+                    html.Div(children=[
+                        html.H3("Note: A notification has been sent to you by email"),
+                    ],id="notif-card",className="notif",hidden=True),
+                ], className='main-header-column'),
+            ],className="user-card")
+        ],className="main-header"),
         html.Div(children=[
-            html.Img(id='bulb', src=LED_OFF, className="icon"),
-            html.Button(children='Switch', n_clicks=0, id='light-on-and-off'),
-        ],className="card"),
-        html.Div(children=[
-            daq.Gauge(
-                label='Temperature',
-                id='temperature',
-                min=0,
-                max=40,
-                value=0,
-                className="icon",
-                showCurrentValue=True,
-                units="C",
-                color={
-                    'gradient':True,
-                    'ranges':{
-                        'green':[0, 10],
-                        'yellow':[10, 20],
-                        'orange':[20, 30],
-                        'red':[30, 40],
+            # html.Div(children=[
+            #     html.Img(id='bulb', src=LED_OFF, className="icon"),
+            #     html.Button(children='Switch', n_clicks=0, id='light-on-and-off'),
+            # ],className="card"),
+            html.Div(children=[
+                daq.Gauge(
+                    label='Temperature',
+                    id='temperature',
+                    min=0,
+                    max=40,
+                    value=0,
+                    className="icon",
+                    showCurrentValue=True,
+                    units="C",
+                    color={
+                        'gradient':True,
+                        'ranges':{
+                            'green':[0, 10],
+                            'yellow':[10, 20],
+                            'orange':[20, 30],
+                            'red':[30, 40],
+                        }
                     }
-                }
-            ),
-            dcc.Interval(
-                id='dht_frame',
-                interval=1000,
-                n_intervals=0,
-            )
-        ],className="card"),
-        html.Div(children=[
-            daq.Gauge(
-                label='Humidity',
-                id='humidity',
-                min=0,
-                max=100,
-                value=0,
-                className="icon",
-                showCurrentValue=True,
-                units="%",
-                color={
-                    'gradient':True,
-                    'ranges':{
-                        'green':[0, 25],
-                        'yellow':[25, 50],
-                        'orange':[50, 75],
-                        'red':[75, 100],
+                ),
+                dcc.Interval(
+                    id='dht_frame',
+                    interval=1000,
+                    n_intervals=0,
+                )
+            ],className="card"),
+            html.Div(children=[
+                daq.Gauge(
+                    label='Humidity',
+                    id='humidity',
+                    min=0,
+                    max=100,
+                    value=0,
+                    className="icon",
+                    showCurrentValue=True,
+                    units="%",
+                    color={
+                        'gradient':True,
+                        'ranges':{
+                            'green':[0, 25],
+                            'yellow':[25, 50],
+                            'orange':[50, 75],
+                            'red':[75, 100],
+                        }
                     }
-                }
-            ),
-        ],className="card"),
-        html.Div(children=[
-            html.Img(id='fan', src=FAN_OFF, className="icon"),
-        ],className="card"),
-        html.Div(children=[
-            html.Img(id='light-intensity', src=LED_OFF, className="icon"),
-            html.H3(id="light-intensity-label", children=123),
-            daq.Slider(min=0,max=1000,value=0,id="intensity-slider",size=200,disabled=True),
-            dcc.Interval(
-                id='light_intensity_frame',
-                interval=1000,
-                n_intervals=0,
-            )
-        ],className="card")
+                ),
+            ],className="card"),
+            html.Div(children=[
+                html.Img(id='fan', src=FAN_OFF, className="icon"),
+            ],className="card"),
+            html.Div(children=[
+                html.Img(id='light-intensity', src=LED_OFF, className="icon"),
+                html.H3(id="light-intensity-label", children=123),
+                daq.Slider(min=0,max=1000,value=0,id="intensity-slider",size=200,disabled=True),
+                dcc.Interval(
+                    id='light_intensity_frame',
+                    interval=1000,
+                    n_intervals=0,
+                )
+            ],className="card"),
+            html.Div(children=[
+                html.Img(id='bluetooth', src=LED_OFF, className="icon"),
+                html.H3(children=0,id="bluetooth-counter"),
+            ],className="card",)
+        ],className="main-content"),
     ],className='main'),
 ])
 
@@ -273,6 +286,63 @@ def updateNotif(n_intervals):
         timer=0
         maxTimer=0
         return True
+
+@app.callback(
+    Output('user-id', 'children'),
+    Input('user-id-frame', 'n_intervals')
+)
+def updateUserId(n):
+    global user_id
+    if(MQTT.rfid is None):
+        return ""
+    SQL.user_id = MQTT.rfid
+    if(SQL.getUser() is None):
+        SQL.createUser()
+    if(SQL.user_id is not user_id):
+        user_id = SQL.user_id
+    return SQL.user_id
+    
+@app.callback(
+    Output('user-name', 'value'),
+    Input('user-name', 'value')
+)
+def updateName(name):
+    SQL.name = name
+    SQL.updateUser()
+    return name
+
+@app.callback(
+    Output('user-temp', 'value'),
+    Input('user-temp', 'value')
+)
+def updateTemp(temp):
+    if(not temp.isnumeric()):
+        return temp
+    SQL.temp_thr = temp
+    SQL.updateUser()
+    return temp
+
+@app.callback(
+    Output('user-humid', 'value'),
+    Input('user-humid', 'value')
+)
+def updateHumi(humi):
+    if(not humi.isnumeric()):
+        return humi
+    SQL.humid_thr = humi
+    SQL.updateUser()
+    return humi
+
+@app.callback(
+    Output('user-light-intensity', 'value'),
+    Input('user-light-intensity', 'value')
+)
+def updateLigh(ligh):
+    if(not ligh.isnumeric()):
+        return ligh
+    SQL.lightintensity_thr = ligh
+    SQL.updateUser()
+    return ligh
 
 if __name__ == '__main__':
     # this is a theory but

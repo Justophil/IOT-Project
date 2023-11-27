@@ -5,6 +5,7 @@ class Mqtt:
     client_id = "" # client id for connecting, if length = 0 or None it creates a new one if clean_session is true
     clean_session=True
     # server="192.168.0.144"
+    # server="192.168.0.118"
     server="172.20.10.3"
     light=0
     rfid=""

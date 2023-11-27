@@ -14,14 +14,14 @@ class SQLite:
     self.humid_thr = -1
     self.lightintensity_thr = -1
 
-  def setUserId(self, user_id):
-    self.user_id = user_id
+  # def setUserId(self, user_id):
+  #   self.user_id = user_id
 
-  def setFieldsData(self, name, temp_thr, humid_thr, lightintensity_thr):
-    self.name = name
-    self.temp_thr = temp_thr
-    self.humid_thr = humid_thr
-    self.lightintensity_thr = lightintensity_thr
+  # def setFieldsData(self, name, temp_thr, humid_thr, lightintensity_thr):
+  #   self.name = name
+  #   self.temp_thr = temp_thr
+  #   self.humid_thr = humid_thr
+  #   self.lightintensity_thr = lightintensity_thr
 
   def connect(self):
     SQLite.conn = sqlite3.connect(SQLite.db_file)
@@ -44,7 +44,7 @@ class SQLite:
     return True
 
   def createUser(self):
-    if (not SQLite.isConnected()):
+    if (not SQLite.isConnected(self)):
       return
     SQLite.cur.execute(
         '''
@@ -58,7 +58,7 @@ class SQLite:
     return SQLite.cur.lastrowid
 
   def deleteUser(self):
-    if (not SQLite.isConnected()):
+    if (not SQLite.isConnected(self)):
       return False
     SQLite.cur.execute('''
       DELETE FROM user WHERE user_id = ?
@@ -67,7 +67,7 @@ class SQLite:
     return SQLite.cur.lastrowid
 
   def updateUser(self):
-    if (not SQLite.isConnected()):
+    if (not SQLite.isConnected(self)):
       return False
     SQLite.cur.execute(
         '''
@@ -80,16 +80,16 @@ class SQLite:
     return SQLite.cur.lastrowid
 
   def getUser(self):
-    if (not SQLite.isConnected()):
+    if (not SQLite.isConnected(self)):
       return False
     SQLite.cur.execute('''
       SELECT * FROM user WHERE user_id=?
     ''', [self.user_id])
     SQLite.conn.commit()
     return SQLite.cur.fetchone()
-  
+
   def getAll(self):
-    if (not SQLite.isConnected()):
+    if (not SQLite.isConnected(self)):
       return False
     SQLite.cur.execute('''
       SELECT * FROM user
@@ -102,12 +102,18 @@ class SQLite:
 
 
 # if __name__ == '__main__':
-#   user = SQLite(2, 'user', 20, 20, 20)
+#   user = SQLite()
+#   # user.setUserId(2)
+#   user.user_id = 2
 #   user.connect()
-#   if(user.getUser() == None):
+#   if (user.getUser() is None):
 #     user.createUser()
-#   # user.name = 'name'
-#   # user.updateUser()
+#   # user.setFieldsData('name', 0, 0, 0)
+#   user.name = 'name'
+#   user.temp_thr = 0
+#   user.humid_thr = 1
+#   user.lightintensity_thr = 1
+#   user.updateUser()
 #   # user.deleteUser()
 #   data = user.getAll()
 #   # data = user.getUser()

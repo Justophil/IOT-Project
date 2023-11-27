@@ -4,6 +4,8 @@ body {
 
 .notif {
     position: relative;
+    /* display:flex; */
+    width: 100%;
     padding: 0.75rem 1.25rem;
     margin-bottom: 1rem;
     border: 1px solid transparent;
@@ -17,11 +19,11 @@ body {
 	height: 80px;
 	border-bottom: 1px solid eff1f6;
 	background-color: #aaaaaa;
-    margin: 20px;
+    margin: 0px 20px;
     align-items: center;
 }
 
-h1 {
+h2 {
     text-align: center;
     text-decoration-color: darkgrey;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
@@ -39,11 +41,37 @@ label {
     font-size: 20.8;
     color: #FFFFFF;
 }
-.main {
-    display:flex;
-    margin: 120px;
-    justify-content: space-evenly;
+hr {
+    width: 75%;
 }
+.main {
+    /* display:flex; */
+    margin: 0px 120px;
+    /* justify-content: space-evenly; */
+}
+
+.main-header {
+    display: flex;
+    flex-direction: row;
+    /* justify-content: space-evenly; */
+    /* height: 25%; */
+    /* width: 100%; */
+}
+
+.main-header-column {
+    display:flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    width: 20%;
+    height: 100%;
+}
+
+.main-content {
+    display:flex;
+    justify-content: space-evenly;
+    width: 100%
+}
+
 .card {
     display: flex;
     flex-direction: column;
@@ -54,7 +82,7 @@ label {
     align-items: center;
     margin: 5px;
     width: 220px;
-    height: 275px;
+    height: 260px;
     border-radius: 30px;
     background: #212121;
     gap: 5px;
@@ -63,15 +91,14 @@ label {
 
 .user-card {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;    
-    padding: 10px;
+    justify-content: space-evenly; 
+    padding: 10px 30px;
     position: relative;
-    text-align: center;
-    align-items: center;
+    /* text-align: center; */
+    align-items: normal;
     margin: 5px;
-    width: 650px;
-    height: 275px;
+    width: 100%;
+    height: 250px;
     border-radius: 30px;
     background: #212121;
     gap: 5px;
