@@ -11,8 +11,9 @@ app = Dash(__name__)
 
 LED_ON = '/assets/img/led_on.png'
 LED_OFF = '/assets/img/led_off.png'
-FAN_ON = '/assets/img/fan_on.png'
+FAN_ON = '/assets/img/fan_on.gif'
 FAN_OFF = '/assets/img/fan_off.png'
+USER_ICON = '/assets/img/user_icon.png'
 
 LEDPin=23
 DHT11Pin=24
@@ -50,7 +51,7 @@ app.layout = html.Div([
         html.Div(children=[
             html.Div(children=[
                 html.Div(children=[
-                    html.Img(src='',className="user-icon")
+                    html.Img(src=USER_ICON,className="")
                 ], className='main-header-column'),
                 html.Div(children=[
                     html.Label(children="ID:",className="user-label"),
