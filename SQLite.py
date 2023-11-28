@@ -8,11 +8,11 @@ class SQLite:
   cur = None
 
   def __init__(self):
-    self.user_id = -1
+    self.user_id = 0
     self.name = ""
-    self.temp_thr = -1
-    self.humid_thr = -1
-    self.lightintensity_thr = -1
+    self.temp_thr = 0
+    self.humid_thr = 0
+    self.lightintensity_thr = 0
 
   # def setUserId(self, user_id):
   #   self.user_id = user_id
@@ -101,20 +101,20 @@ class SQLite:
     SQLite.conn.close()
 
 
-# if __name__ == '__main__':
-#   user = SQLite()
-#   # user.setUserId(2)
-#   user.user_id = 2
-#   user.connect()
-#   if (user.getUser() is None):
-#     user.createUser()
-#   # user.setFieldsData('name', 0, 0, 0)
-#   user.name = 'name'
-#   user.temp_thr = 0
-#   user.humid_thr = 1
-#   user.lightintensity_thr = 1
-#   user.updateUser()
-#   # user.deleteUser()
-#   data = user.getAll()
-#   # data = user.getUser()
-#   print(data)
+if __name__ == '__main__':
+  user = SQLite()
+  # user.setUserId(2)
+  user.user_id = 2
+  user.connect()
+  if (user.getUser() is None):
+    user.createUser()
+  # user.setFieldsData('name', 0, 0, 0)
+  user.name = 'name'
+  user.temp_thr = 0
+  user.humid_thr = 1
+  user.lightintensity_thr = 1
+  user.updateUser()
+  # user.deleteUser()
+  data = user.getAll()
+  # data = user.getUser()
+  print(data[0][0])

@@ -27,7 +27,7 @@ DHT11 = DHT11.DHT11(DHT11Pin)
 MAIL = MAIL.Email()
 MQTT = MQTT.Mqtt()
 SQL = SQL.SQLite()
-SQL.connect()
+# SQL.connect()
 
 not_sent=1
 not_sent2=1
@@ -66,7 +66,7 @@ app.layout = html.Div([
                     html.Label(children="Light Intensity Threshold:",className="user-label"),
                 ], className='main-header-column'),
                 html.Div(children=[
-                    html.Label(id="user-id",className="user-label"),
+                    html.Label(id="user-id",children="",className="user-label"),
                     dcc.Input(id="user-name",type="text",placeholder="Name",className="user-input"),
                     dcc.Input(id="user-temp",type="text",placeholder="Temperature",className="user-input"),
                     dcc.Input(id="user-humid",type="text",placeholder="Humidity",className="user-input"),
@@ -289,61 +289,39 @@ def updateNotif(n_intervals):
         return True
 
 @app.callback(
-    Output('user-id', 'children'),
-    Input('user-id-frame', 'n_intervals')
+    [Output('user-id', 'children'),Output('user-name', 'value'),Output('user-temp', 'value'),Output('user-humid', 'value'),Output('user-light-intensity', 'value')],
+    [Input('user-id-frame', 'n_intervals'),Input('user-name', 'value'),Input('user-temp', 'value'),Input('user-humid', 'value'),Input('user-light-intensity', 'value')]
 )
-def updateUserId(n):
+def updateUser(n,name,temp,humi,ligh):
     global user_id
+    SQL.connect()
     if(MQTT.rfid is None):
-        return ""
+        return ["", "", 0,0,0]
     SQL.user_id = MQTT.rfid
     if(SQL.getUser() is None):
         SQL.createUser()
     if(SQL.user_id is not user_id):
         user_id = SQL.user_id
-    return SQL.user_id
-    
-@app.callback(
-    Output('user-name', 'value'),
-    Input('user-name', 'value')
-)
-def updateName(name):
-    SQL.name = name
-    SQL.updateUser()
-    return name
-
-@app.callback(
-    Output('user-temp', 'value'),
-    Input('user-temp', 'value')
-)
-def updateTemp(temp):
-    if(not temp.isnumeric()):
-        return temp
-    SQL.temp_thr = temp
-    SQL.updateUser()
-    return temp
-
-@app.callback(
-    Output('user-humid', 'value'),
-    Input('user-humid', 'value')
-)
-def updateHumi(humi):
-    if(not humi.isnumeric()):
-        return humi
-    SQL.humid_thr = humi
-    SQL.updateUser()
-    return humi
-
-@app.callback(
-    Output('user-light-intensity', 'value'),
-    Input('user-light-intensity', 'value')
-)
-def updateLigh(ligh):
-    if(not ligh.isnumeric()):
-        return ligh
-    SQL.lightintensity_thr = ligh
-    SQL.updateUser()
-    return ligh
+        sql = SQL.getUser()
+        SQL.name = sql[1]
+        SQL.temp_thr = sql[2]
+        SQL.humid_thr = sql[3]
+        SQL.lightintensity_thr = sql[4]
+        return [SQL.user_id,SQL.name,SQL.temp_thr,SQL.humid_thr,SQL.lightintensity_thr]
+    if(SQL.user_id is user_id):
+        if(name is not None):
+            SQL.name = name
+            SQL.updateUser()
+        if(temp is not None):
+            SQL.temp_thr = int(temp)
+            SQL.updateUser()
+        if(humi is not None):
+            SQL.humid_thr = int(humi)
+            SQL.updateUser()
+        if(ligh is not None):
+            SQL.lightintensity_thr = int(ligh)
+            SQL.updateUser()
+    return [SQL.user_id,SQL.name,SQL.temp_thr,SQL.humid_thr,SQL.lightintensity_thr]
 
 if __name__ == '__main__':
     # this is a theory but
