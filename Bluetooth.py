@@ -39,7 +39,8 @@ def scan(rssi_threshold):
         return len(devices_threshold)
     
     except Exception as ex:
-        print ( "Unexpected error in BLE Scanner BLUEPY: %s" % ex )
+        # print ( "Unexpected error in BLE Scanner BLUEPY: %s" % ex )
+        return -1
 
 if __name__ == '__main__':
     print(scan(rssi_threshold))

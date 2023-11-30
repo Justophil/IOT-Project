@@ -6,6 +6,7 @@ import Emails as MAIL
 import DCMotor as DC
 import Mqtt as MQTT
 import SQLite as SQL
+import Bluetooth
 
 app = Dash(__name__)
 
@@ -59,7 +60,8 @@ app.layout = html.Div([
                     html.Label(children="ID:",className="user-label"),
                     dcc.Interval(
                         id="user-id-frame",
-                        interval=1000,
+                        # interval=1000,
+                        interval=5000,
                         n_intervals=0
                     ),
                     html.Label(children="Name:",className="user-label"),
@@ -90,6 +92,15 @@ app.layout = html.Div([
             html.Div(children=[
                 html.Img(id='bulb', src=LED_OFF, className="icon"),
                 html.Button(children='Switch', n_clicks=0, id='light-on-and-off'),
+                html.Hr(),
+                html.Label(children='Devices Nearby'),
+                html.Label(children='N/A',id="bluetooth-label"),
+                dcc.Interval(
+                    id='bluetooth_frame',
+                    interval=1000,
+                    n_intervals=0,
+                ),
+                html.Br()
             ],className="card"),
             html.Div(children=[
                 daq.Gauge(
@@ -344,6 +355,16 @@ def updateUser(n,name,temp,humi,ligh):
             SQL.updateUser()
             lightintensity_thr = int(ligh)
     return [SQL.user_id,SQL.name,SQL.temp_thr,SQL.humid_thr,SQL.lightintensity_thr]
+
+@app.callback(
+    Output('bluetooth-label', 'children'),
+    Input('bluetooth_frame','n_intervals')
+)
+def updateBluetooth(n):
+    if (Bluetooth.scan(Bluetooth.rssi_threshold) >= 0):
+        print(Bluetooth.scan(Bluetooth.rssi_threshold))
+        return Bluetooth.scan(Bluetooth.rssi_threshold)
+    return 'N/A'
 
 if __name__ == '__main__':
     # this is a theory but

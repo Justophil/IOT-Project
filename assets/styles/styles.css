@@ -1,5 +1,5 @@
 body {
-    background-color: #2d2d2d;
+    background-color: #515151;
 }
 
 .notif {
@@ -18,14 +18,14 @@ body {
 	align-items: center;
 	height: 80px;
 	border-bottom: 1px solid eff1f6;
-	background-color: #2d2d2d;
+	background-color: #515151;
     margin: 0px 20px;
     align-items: center;
 }
 
 h2 {
     text-align: center;
-    text-decoration-color: #2d2d2d;
+    text-decoration-color: #515151;
     color:#FFFFFF;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
