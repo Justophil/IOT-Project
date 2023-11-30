@@ -3,8 +3,10 @@ import sys
 from bluepy.btle import Scanner, DefaultDelegate
 from pygments import highlight, lexers, formatters
  
-rssi_threshold = -50
+rssi_threshold = -100
+bluetooth_devices = 0
 def scan(rssi_threshold):
+    global bluetooth_devices
     try:
     
         scanner = Scanner() 
@@ -35,12 +37,13 @@ def scan(rssi_threshold):
         formatted_json = json.dumps(devices_m, indent=4)
         colorful_json = highlight(formatted_json, lexers.JsonLexer(), formatters.TerminalFormatter())
         # print(colorful_json)
-        print(devices_threshold)
+        print(len(devices_threshold))
+        bluetooth_devices = len(devices_threshold)
         return len(devices_threshold)
     
     except Exception as ex:
         # print ( "Unexpected error in BLE Scanner BLUEPY: %s" % ex )
-        return -1
+        return bluetooth_devices
 
 if __name__ == '__main__':
     print(scan(rssi_threshold))

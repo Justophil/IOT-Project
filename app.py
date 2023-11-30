@@ -46,6 +46,7 @@ temp_thr=0
 humid_thr=0
 lightintensity_thr=0
 user_id=""
+bluetooth_length=0
 app.layout = html.Div([
     html.Div(children=[
         html.H2('Dashboard'),
@@ -60,8 +61,8 @@ app.layout = html.Div([
                     html.Label(children="ID:",className="user-label"),
                     dcc.Interval(
                         id="user-id-frame",
-                        # interval=1000,
-                        interval=5000,
+                        interval=1000,
+                        # interval=5000,
                         n_intervals=0
                     ),
                     html.Label(children="Name:",className="user-label"),
@@ -361,10 +362,12 @@ def updateUser(n,name,temp,humi,ligh):
     Input('bluetooth_frame','n_intervals')
 )
 def updateBluetooth(n):
+    global bluetooth_length
     if (Bluetooth.scan(Bluetooth.rssi_threshold) >= 0):
-        print(Bluetooth.scan(Bluetooth.rssi_threshold))
+        # print(Bluetooth.scan(Bluetooth.rssi_threshold))
+        bluetooth_length = Bluetooth.scan(Bluetooth.rssi_threshold)
         return Bluetooth.scan(Bluetooth.rssi_threshold)
-    return 'N/A'
+    return bluetooth_length
 
 if __name__ == '__main__':
     # this is a theory but
