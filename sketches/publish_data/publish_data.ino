@@ -91,12 +91,6 @@ void loop() {
 //  client.loop();
 
   value = analogRead(pResistor);
-  if(value < 400) {
-    digitalWrite(led, HIGH);
-  }
-  else {
-    digitalWrite(led, LOW);
-  }
   String val = String(value);
   Serial.println(val);
   client.publish("LightIntensity", val.c_str());

@@ -16,12 +16,13 @@ FAN_OFF = '/assets/img/fan_off.png'
 USER_ICON = '/assets/img/user_icon.png'
 
 LEDPin=23
+LEDRPin=25
 DHT11Pin=24
 ENABLEDC=17
 INPUT1DC=22
 INPUT2DC=27
 
-LED = LED.LED(LEDPin)
+LED = LED.LED(LEDPin,LEDRPin)
 DC = DC.DCMotor(ENABLEDC, INPUT1DC, INPUT2DC)
 DHT11 = DHT11.DHT11(DHT11Pin)
 MAIL = MAIL.Email()
@@ -31,6 +32,7 @@ SQL = SQL.SQLite()
 
 not_sent=1
 not_sent2=1
+not_sent3=1
 has_replied=0
 fan_status=0
 tempera=0
@@ -39,9 +41,9 @@ light=0
 sent_notification=0
 timer=0
 maxTimer=0
-temp_thr=24
-humid_thr=60
-lightintensity_thr=400
+temp_thr=0
+humid_thr=0
+lightintensity_thr=0
 user_id=""
 app.layout = html.Div([
     html.Div(children=[
@@ -67,10 +69,10 @@ app.layout = html.Div([
                 ], className='main-header-column'),
                 html.Div(children=[
                     html.Label(id="user-id",children="",className="user-label"),
-                    dcc.Input(id="user-name",type="text",placeholder="Name",className="user-input"),
-                    dcc.Input(id="user-temp",type="text",placeholder="Temperature",className="user-input"),
-                    dcc.Input(id="user-humid",type="text",placeholder="Humidity",className="user-input"),
-                    dcc.Input(id="user-light-intensity",type="text",placeholder="Light Intensity",className="user-input"),
+                    dcc.Input(id="user-name",type="text",placeholder="Name",className="user-input", value=""),
+                    dcc.Input(id="user-temp",type="text",placeholder="Temperature",className="user-input", value=24),
+                    dcc.Input(id="user-humid",type="text",placeholder="Humidity",className="user-input", value=60),
+                    dcc.Input(id="user-light-intensity",type="text",placeholder="Light Intensity",className="user-input", value=400),
                 ], className='main-header-column'),
                 html.Div(children=[
                     dcc.Interval(
@@ -85,10 +87,10 @@ app.layout = html.Div([
             ],className="user-card")
         ],className="main-header"),
         html.Div(children=[
-            # html.Div(children=[
-            #     html.Img(id='bulb', src=LED_OFF, className="icon"),
-            #     html.Button(children='Switch', n_clicks=0, id='light-on-and-off'),
-            # ],className="card"),
+            html.Div(children=[
+                html.Img(id='bulb', src=LED_OFF, className="icon"),
+                html.Button(children='Switch', n_clicks=0, id='light-on-and-off'),
+            ],className="card"),
             html.Div(children=[
                 daq.Gauge(
                     label='Temperature',
@@ -137,7 +139,10 @@ app.layout = html.Div([
                 ),
             ],className="card"),
             html.Div(children=[
-                html.Img(id='fan', src=FAN_OFF, className="icon"),
+                html.Img(id='fan', src=FAN_OFF, className="icon",style={
+                    'width': '200px',
+                    'height': '200px'
+                }),
             ],className="card"),
             html.Div(children=[
                 html.Img(id='light-intensity', src=LED_OFF, className="icon"),
@@ -149,10 +154,10 @@ app.layout = html.Div([
                     n_intervals=0,
                 )
             ],className="card"),
-            html.Div(children=[
-                html.Img(id='bluetooth', src=LED_OFF, className="icon"),
-                html.H3(children=0,id="bluetooth-counter"),
-            ],className="card",)
+            # html.Div(children=[
+            #     html.Img(id='bluetooth', src=LED_OFF, className="icon"),
+            #     html.H3(children=0,id="bluetooth-counter"),
+            # ],className="card",)
         ],className="main-content"),
     ],className='main'),
 ])
@@ -198,7 +203,7 @@ def updateFan(temp):
         not_sent=1
     if temp > temp_thr and not_sent:
         not_sent=0
-        MAIL.setMessages(tempera)
+        MAIL.setMessages(temp=tempera)
         # Send email
         MAIL.send("message")
         # Wait for the user's response
@@ -249,10 +254,12 @@ def updateLight(intensity):
     global lightintensity_thr
     if(intensity < lightintensity_thr):
         sent_notification = 1
+        LED.turnR_on()
         return LED_ON
     else:
         sent_notification=0
         light_status=0
+        LED.turnR_off()
         return LED_OFF
     # if(light_status):
     #     LED.turn_on()
@@ -278,7 +285,7 @@ def updateNotif(n_intervals):
     if(timer <= maxTimer and timer != maxTimer):
         if(not_sent2):
             not_sent2=0  
-            MAIL.setMessages(0)
+            MAIL.setMessages()
             MAIL.send("notification")      
         timer+=1
         return False
@@ -294,33 +301,48 @@ def updateNotif(n_intervals):
 )
 def updateUser(n,name,temp,humi,ligh):
     global user_id
+    global not_sent3
+    global temp_thr
+    global humid_thr
+    global lightintensity_thr
     SQL.connect()
     if(MQTT.rfid is None):
-        return ["", "", 0,0,0]
+        return ["", name, temp,humi, ligh]
     SQL.user_id = MQTT.rfid
     if(SQL.getUser() is None):
         SQL.createUser()
     if(SQL.user_id is not user_id):
+        if(not_sent3):
+            not_sent3 = 0
+            MAIL.setMessages(rfid=SQL.user_id)
+            MAIL.send("user")
         user_id = SQL.user_id
         sql = SQL.getUser()
         SQL.name = sql[1]
         SQL.temp_thr = sql[2]
         SQL.humid_thr = sql[3]
         SQL.lightintensity_thr = sql[4]
+        temp_thr = sql[2]
+        humid_thr = sql[3]
+        lightintensity_thr = sql[4]
         return [SQL.user_id,SQL.name,SQL.temp_thr,SQL.humid_thr,SQL.lightintensity_thr]
     if(SQL.user_id is user_id):
+        not_sent3 = 1
         if(name is not None):
             SQL.name = name
             SQL.updateUser()
         if(temp is not None):
-            SQL.temp_thr = int(temp)
+            SQL.temp_thr = float(temp)
             SQL.updateUser()
+            temp_thr = float(temp)
         if(humi is not None):
-            SQL.humid_thr = int(humi)
+            SQL.humid_thr = float(humi)
             SQL.updateUser()
+            humid_thr = float(humi)
         if(ligh is not None):
             SQL.lightintensity_thr = int(ligh)
             SQL.updateUser()
+            lightintensity_thr = int(ligh)
     return [SQL.user_id,SQL.name,SQL.temp_thr,SQL.humid_thr,SQL.lightintensity_thr]
 
 if __name__ == '__main__':

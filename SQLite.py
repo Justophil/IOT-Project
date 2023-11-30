@@ -101,20 +101,20 @@ class SQLite:
     SQLite.conn.close()
 
 
-if __name__ == '__main__':
-  user = SQLite()
-  # user.setUserId(2)
-  user.user_id = 2
-  user.connect()
-  if (user.getUser() is None):
-    user.createUser()
-  # user.setFieldsData('name', 0, 0, 0)
-  user.name = 'name'
-  user.temp_thr = 0
-  user.humid_thr = 1
-  user.lightintensity_thr = 1
-  user.updateUser()
-  # user.deleteUser()
-  data = user.getAll()
-  # data = user.getUser()
-  print(data[0][0])
+# if __name__ == '__main__':
+  # user = SQLite()
+#   # user.setUserId(2)
+#   user.user_id = 2
+  # user.connect()
+#   if (user.getUser() is None):
+#     user.createUser()
+#   # user.setFieldsData('name', 0, 0, 0)
+#   user.name = 'name'
+#   user.temp_thr = 0
+#   user.humid_thr = 1
+#   user.lightintensity_thr = 1
+#   user.updateUser()
+#   # user.deleteUser()
+  # data = user.getAll()
+#   # data = user.getUser()
+  # print(data[0])

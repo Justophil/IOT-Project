@@ -1,5 +1,5 @@
 body {
-    background-color: #aaaaaa;
+    background-color: #2d2d2d;
 }
 
 .notif {
@@ -18,14 +18,15 @@ body {
 	align-items: center;
 	height: 80px;
 	border-bottom: 1px solid eff1f6;
-	background-color: #aaaaaa;
+	background-color: #2d2d2d;
     margin: 0px 20px;
     align-items: center;
 }
 
 h2 {
     text-align: center;
-    text-decoration-color: darkgrey;
+    text-decoration-color: #2d2d2d;
+    color:#FFFFFF;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 h3 {
@@ -129,4 +130,16 @@ button {
 .toggleOff {
     color: #313131;
     background-color: white;
+}
+
+input[type=text] {
+	appearance: none;
+	border: none;
+	outline: none;
+	border-bottom: .2em solid #000000;
+	background-color: #1c1c1c;
+	border-radius: .2em .2em 0 0;
+	padding: .4em;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+	color: #FFFFFF;
 }

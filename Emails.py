@@ -19,6 +19,7 @@ class Email:
 
     message = ""
     notification = ""
+    userMessage = ""
 
     simple_email_context = ssl.create_default_context()
 
@@ -30,8 +31,8 @@ class Email:
     def __init__(self):
         pass
     
-    def setMessages(self, temp):
-        self.message = """From: From IOT-Dashboard <iotdashboard@iotDash.com>
+    def setMessages(self, temp=0,rfid=""):
+        self.message = """From: From IOT-Dashboard <""" + self.email_from + """>
         To: Client <""" + self.email_to + """>
         Subject: Notice! the room is getting hot
 
@@ -39,12 +40,18 @@ class Email:
         Would you like to turn on the fan?
         Please confirm your response in a reply to this email.
         """
-        self.notification = """From: From IOT-Dashboard <iotdashboard@iotDash.com>
+        self.notification = """From: From IOT-Dashboard <""" + self.email_from + """>
         To: Client <""" + self.email_to + """>
         Subject: Notification!
 
         The Light is ON at """ + str(datetime.datetime.now()) + """ time.
         """
+        self.userMessage = """From: From IOT-Dashboard <""" + self.email_from + """>
+        To: Client <""" + self.email_to + """>
+        Subject: Welcome!
+
+        User """ + str(rfid) + """ entered at """ + str(datetime.datetime.now()) + """ time.
+        """ 
         # strftime("%Y-%m-%d %H:%M:%S", gmtime())
         # datetime.datetime.now()
         
@@ -63,6 +70,8 @@ class Email:
                 TIE_server.sendmail(self.email_from, self.email_to, self.message)
             if(option == "notification"):
                 TIE_server.sendmail(self.email_from, self.email_to, self.notification)
+            if(option == "user"):
+                TIE_server.sendmail(self.email_from, self.email_to, self.userMessage)
             print(f"Email successfully sent to - {self.email_to}")
 
         # If there's an error, print it out
